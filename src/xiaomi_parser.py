@@ -286,8 +286,8 @@ def load_brand_codes(filename):
             shutter_code = json_model["key"].get("shutter")
             if not power_code and not shutter_code:
                 LOGGER.warning(
-                    "Key power/shutter NOT FOUND in 'others': %s",
-                    json_model["key"].keys(),
+                    "Key power/shutter NOT FOUND in 'others', id <%s>: %s",
+                    json_model["_id"], json_model["key"].keys(),
                 )
                 continue
 
