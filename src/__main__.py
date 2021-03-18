@@ -36,6 +36,8 @@ def load_device_codes(device_directory):
     Brand files are located in `<database_dump>/<device>/*.json`.
     They contain (theoretically) only power codes.
 
+    .. warning:: Returned Patterns ARE NOT unique. Make a set if you want this.
+
     :param device_directory: Directory of a device (brands files are stored in it).
     :type device_directory: <str> or <Path>
     :return: List of Pattern objects (wrappers for decrypted IR codes).
@@ -87,7 +89,10 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None):
 
 
 def tvkill_export(patterns, export_filename):
-    """Export Pattern objects to JSON data for TV Kill app"""
+    """Export Pattern objects to JSON data for TV Kill app
+
+    .. note:: Unique patterns are used to reduce overhead.
+    """
     code_list = [
         {
             "comment": "{} {}".format(code.vendor_id, code.model_id),
