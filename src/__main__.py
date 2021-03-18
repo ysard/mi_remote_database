@@ -50,17 +50,25 @@ def load_device_codes(device_directory):
     return ir_codes
 
 
-def db_export(deviceid=None, format=None, db_path=None):
+def db_export(deviceid=None, format=None, list_devices=False, db_path=None):
     """Export data to (various ?) formats"""
+    # Load devices ids/names mapping
+    device_mapping = {
+        k: v["name"] for k, v in
+        load_devices(Path(f"{db_path}/devices.json")).items()
+    }
+
+    # Display available devices if asked
+    if list_devices:
+        print("Device Name: Device ID")
+        [print(f"{v}: {k}") for k, v in device_mapping.items()]
+        exit(0)
+
     # Expect directory <db_dir>/<int>_<device_name>/
     directory = [p for p in Path(db_path).glob(f"{deviceid}_*") if p.is_dir()]
     if len(directory) != 1:
         LOGGER.error("Missing or Wrong directory %s", directory)
 
-    # Load devices ids/names mapping
-    device_mapping = {
-        k: v["name"] for k, v in load_devices(Path(f"{db_path}/devices.json")).items()
-    }
     # Build export filename based on device name
     export_filename = "Xiaomi " + device_mapping[deviceid]
 
@@ -136,6 +144,10 @@ def main():
     )
     parser_export.add_argument(
         "-f", "--format", help="Export format (tvkill for now)", default="tvkill"
+    )
+    parser_export.add_argument(
+        "-l", "--list_devices", help="List available devices in DB",
+        action="store_true"
     )
     parser_export.add_argument(
         "-p",
