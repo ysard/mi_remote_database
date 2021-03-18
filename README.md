@@ -143,15 +143,15 @@ moreover, some examples are available in unit tests.
 
 ## Data structure
 
-.
-├── database_dump
-│   ├── 10_Projector.json # "Device" file: List of brands for this type of device (HP, Epson, Philips, etc.)
-│   ├── 10_Projector      # "Brands" directory: 1 file per brand
-│   │   ├── 3M_1.json     # "Brand" file: each file contains multiple models references with (most of the time) their *power* code
-│   │   ├── ...
-│   │   ├── models        # "Models" directory: 1 file per model
-│   │   │   ├── 1_8582.json # "Model" file: Definitions of all IR codes known for one model
-│   │   │   ├── ...
+    .
+    ├── database_dump
+    │   ├── 10_Projector.json # "Device" file: List of brands for this type of device (HP, Epson, Philips, etc.)
+    │   ├── 10_Projector      # "Brands" directory: 1 file per brand
+    │   │   ├── 3M_1.json     # "Brand" file: each file contains multiple models references with (most of the time) their *power* code
+    │   │   ├── ...
+    │   │   ├── models        # "Models" directory: 1 file per model
+    │   │   │   ├── 1_8582.json # "Model" file: Definitions of all IR codes known for one model
+    │   │   │   ├── ...
 
 ## Pattern object
 
