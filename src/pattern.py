@@ -30,13 +30,32 @@ class Pattern:
     Burst/pulse values are expressed in number of cycles of the carrier for which
     to turn the light on and off.
 
-    Formats:
+    Supported formats:
         - raw: Timmings in microseconds (us)
         - signed raw: Same as raw but positive values are for ON time,
           and negative ones for OFF time.
         - pronto: Hex values embedding the carrier frequency, metadata about
           the length of the 2 embedded sequences, and the burst/pulse pairs.
         - pulses: Numerical values of the pulse pairs.
+
+    Conversion methods available (See in-code documentation):
+
+        - :meth:`to_pronto`
+        - :meth:`from_pronto`
+        - :meth:`from_pulses`
+        - :meth:`to_raw`
+        - :meth:`to_signed_raw`
+        - :meth:`to_pulses`
+
+    Examples:
+
+        >>> pronto = "0000 0071 0000 0002 0000 00AA 0000 0040 0000 0040 0000 0015"
+        >>> pattern = Pattern(pronto, None, code_type="pronto")
+
+        >>> ir_code = [9042,4484,579,552,580,567,579,567,544,554]
+        >>> pattern = Pattern(ir_code, 37990, code_type="raw")
+
+    Python sets can be made to ensure the uniqueness of Pattern objects.
     """
 
     def __init__(self, ir_code, frequency=None, code_type="raw", model_id=None, vendor_id=None):

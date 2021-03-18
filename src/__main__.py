@@ -22,7 +22,6 @@ from pathlib import Path
 import argparse
 
 # Custom imports
-from .crypt_utils import process_xiaomi_shit
 from .xiaomi_parser import load_brand_codes, load_brand_codes_from_dir, build_patterns
 from .xiaomi_query import dump_database, load_devices
 from .pattern import Pattern
@@ -36,6 +35,11 @@ def load_device_codes(device_directory):
 
     Brand files are located in `<database_dump>/<device>/*.json`.
     They contain (theoretically) only power codes.
+
+    :param device_directory: Directory of a device (brands files are stored in it).
+    :type device_directory: <str> or <Path>
+    :return: List of Pattern objects (wrappers for decrypted IR codes).
+    :rtype: <list <Pattern>>
     """
     # Extract encrypted codes from all the models these brands
     models_per_brand = load_brand_codes_from_dir(device_directory)
