@@ -24,10 +24,10 @@ TODO: put the deviceid/vendorid in the Pattern object
 import json
 from pathlib import Path
 
-# Custom imports
-from .crypt_utils import build_url, process_xiaomi_shit
-from .pattern import Pattern
 from .commons import logger
+# Custom imports
+from .crypt_utils import process_xiaomi_shit
+from .pattern import Pattern
 
 LOGGER = logger()
 
@@ -168,7 +168,7 @@ def load_brand_list(filename):
     return brands
 
 
-def load_brand_codes(directory, filename):
+def load_brand_codes(filename):
     """Extract IR encrypted codes for each model from a given JSON dump of a brand
 
     {
@@ -278,8 +278,6 @@ def load_brand_codes(directory, filename):
     """
 
     def parse_others_section(section):
-        # TODO: filter on other keys than power/power_r/shutter
-
         for json_model in section:
             buttons = [
                 {
@@ -290,15 +288,18 @@ def load_brand_codes(directory, filename):
                 for name, ircode in json_model["key"].items()
             ]
 
-            yield buttons
+            yield buttons, json_model["source"]
 
     json_filedata = json.loads(Path(filename).read_text())
-    buttons = list()
+    models = list()
 
     if "others" in json_filedata["data"]:
         # "others" section is not considered for now
-        for other_buttons in parse_others_section(json_filedata["data"]["others"]):
-            buttons += other_buttons
+        for other_buttons, source in parse_others_section(json_filedata["data"]["others"]):
+            models.append({
+                'buttons': other_buttons,
+                'source': source
+            })
 
     ############################################################################
 
@@ -306,14 +307,14 @@ def load_brand_codes(directory, filename):
 
     if "seceret_key" not in tree:
         # Empty tree
-        return buttons
+        return models
 
     assert tree["seceret_key"] is None  # TODO: To be identified correctly later
     json_models = tree["nodes"]
     for json_model in json_models:
         if "ir_zip_key" not in json_model:
             continue  # Skip the first element: "children_index"
-        main_button = {
+        button = {
             "id": json_model["keyid"],
             "ir_zip_key": json_model["ir_zip_key"],
             "frequency": json_model["frequency"]
@@ -321,27 +322,12 @@ def load_brand_codes(directory, filename):
         # Optional reverse code
         reverse_code = json_model.get("ir_zip_key_r")
         if reverse_code:
-            main_button["ir_zip_key_r"] = reverse_code
-
-        buttons.insert(0, main_button)  # button at the head of the hierarchy has a higher priority
-        for keyset in json_model['keysetids']:
-            buttons += load_keyset_buttons(directory, keyset)
-    return buttons
-
-
-def load_keyset_buttons(directory, keyset):
-    json_filedata = json.loads(Path(str(directory) + '/models/' + keyset + '.json').read_text())
-    json_model = json_filedata["data"]
-    if 'key' not in json_model:
-        return []
-    return [
-        {
-            "id": name,
-            "ir_zip_key": ircode,
-            "frequency": json_model["frequency"]
-        }
-        for name, ircode in json_model["key"].items()
-    ]
+            button["ir_zip_key_r"] = reverse_code
+        models.append({
+            'buttons': [button],
+            'keysetids': json_model['keysetids']
+        })
+    return models
 
 
 def build_patterns(models):
@@ -409,7 +395,7 @@ def load_brand_codes_from_dir(directory):
     for json_file in Path(directory).glob("*.json"):
         print(json_file, "...", end="")
         # Load codes from models in this brand file
-        temp_models = load_brand_codes(directory, json_file)
+        temp_models = load_brand_codes(json_file)
         models[json_file.stem] = temp_models
         print(len(temp_models))
         total += len(temp_models)

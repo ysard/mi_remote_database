@@ -192,6 +192,15 @@ class Pattern:
         """
         return tuple(self.ir_code)
 
+    def to_flipper(self):
+        content = str()
+        content += "name: " + self.id
+        content += "\ntype: raw"
+        content += "\nfrequency: " + str(self.frequency)
+        content += "\nduty_cycle: 0.330000"
+        content += "\ndata: " + ' '.join([str(timing) for timing in self.to_raw()])
+        return content
+
     def to_signed_raw(self):
         """Raw timmings, positive meaning ON negative meaning OFF
 

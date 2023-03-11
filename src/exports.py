@@ -1,25 +1,47 @@
 import json
 import os
+from itertools import chain
 from pathlib import Path
 
+from src.xiaomi_parser import build_patterns
 
-def flipper_export(brands, export_filename):
+
+def flipper_export(db_directory, models, export_filename):
     directory = Path(export_filename.replace(" ", "_"))
     if not directory.exists():
         directory.mkdir()
-    for brand_per_patterns in brands:
-        content = "Filetype: IR signals file\nVersion: 1"
-        for pattern in brand_per_patterns['ir_codes']:
-            content += "\n#"
-            content += "\nname: " + pattern.id
-            content += "\ntype: raw"
-            content += "\nfrequency: " + str(pattern.frequency)
-            content += "\nduty_cycle: 0.330000"
-            content += "\ndata: " + ' '.join([str(timing) for timing in pattern.to_raw()])
-        path = Path(str(directory) + "/" + brand_per_patterns['brand'] + ".ir")
+    for model_index in range(len(models)):
+        model = models[model_index]
+        content = "Filetype: IR signals file\nVersion: 1\n"
+        patterns = model['ir_codes']
+
+        if model['keysetids'] is not None:
+            patterns += chain(*[load_keyset_codes(db_directory, keyset) for keyset in model['keysetids']])
+
+        for pattern in patterns:
+            content += "\n#\n"
+            content += pattern.to_flipper()
+
+        path = Path(str(directory) + "/" + model['brand'] + "_" + str(model_index) + ".ir")
         if path.exists():
             os.remove(path)
         path.write_text(content)
+
+
+def load_keyset_codes(directory, keyset):
+    json_filedata = json.loads(Path(str(directory) + '/models/' + keyset + '.json').read_text())
+    json_model = json_filedata["data"]
+    if 'key' not in json_model:
+        return []
+    ir_codes = [
+        {
+            "id": name,
+            "ir_zip_key": ircode,
+            "frequency": json_model["frequency"]
+        }
+        for name, ircode in json_model["key"].items()
+    ]
+    return build_patterns(ir_codes)
 
 
 def tvkill_export(patterns, export_filename):

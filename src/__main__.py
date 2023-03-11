@@ -15,18 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Entry point and argument parser"""
-# Standard imports
-import itertools as it
-import json
-from pathlib import Path
 import argparse
+# Standard imports
+from pathlib import Path
 
+import src.commons as cm
 from .exports import flipper_export, tvkill_export
 # Custom imports
-from .xiaomi_parser import load_brand_codes, load_brand_codes_from_dir, build_patterns
+from .xiaomi_parser import load_brand_codes_from_dir, build_patterns
 from .xiaomi_query import dump_database, load_devices
-from .pattern import Pattern
-import src.commons as cm
 
 LOGGER = cm.logger()
 
@@ -46,17 +43,19 @@ def load_device_codes(device_directory):
     """
     # Extract encrypted codes from all the models these brands
     models_per_brand = load_brand_codes_from_dir(device_directory)
-    decrypted = [
-        {
-            "brand": brand,
-            # Get Patterns from clear IR codes
-            "ir_codes": build_patterns(buttons)
-        }
-        for brand, buttons in models_per_brand.items()
-    ]
+    models = list()
+    for brand, models_dict in models_per_brand.items():
+        for model in models_dict:
+            models.append({
+                "brand": brand,
+                "ir_codes": build_patterns(model["buttons"]),
+                "source": model.get("source", None),
+                "keysetids": model.get("keysetids", None)
+            })
 
     print("Nb brands:", len(models_per_brand))
-    return decrypted
+    print("Nb models:", len(models))
+    return models
 
 
 def db_export(deviceid=None, format=None, list_devices=False, db_path=None):
@@ -86,12 +85,12 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None):
     export_filename = str(output_path) + "/" + device_mapping[deviceid]
 
     # Load codes from directory
-    ir_patterns = load_device_codes(directory[0])
+    models = load_device_codes(directory[0])
 
     if format == "tvkill":
-        tvkill_export(ir_patterns, export_filename)
+        tvkill_export(models, export_filename)
     elif format == "flipper":
-        flipper_export(ir_patterns, export_filename)
+        flipper_export(directory[0], models, export_filename)
     else:
         LOGGER.error("To be implemented")
         raise NotImplementedError
