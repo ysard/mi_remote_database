@@ -53,7 +53,7 @@ def load_device_codes(device_directory):
                 "source": model.get("source", None),
                 "keysetids": model.get("keysetids", None)
             })
-    ir_codes = list(chain(*[chain(*model['ir_codes']) for model in models]))
+    ir_codes = list(chain(*[model['ir_codes'] for model in models]))
 
     print("Nb brands:", len(models_per_brand))
     print("Nb models:", len(models))

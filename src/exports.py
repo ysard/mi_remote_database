@@ -18,6 +18,9 @@ def flipper_export(db_directory, models, export_filename):
         if model['keysetids'] is not None:
             patterns += chain(*[load_keyset_codes(db_directory, keyset) for keyset in model['keysetids']])
 
+        if model.get('_id', None) is not None:
+            patterns += chain(*load_keyset_codes(db_directory, model['_id']))
+
         for pattern in patterns:
             content += "\n#\n"
             content += pattern.to_flipper()
