@@ -50,7 +50,7 @@ def tvkill_export(models, export_filename):
     .. note:: Unique patterns are used to reduce overhead.
     """
     patterns = filter(
-        lambda pattern: pattern.id == 'power' or pattern.id == 'shutter',
+        lambda pattern: pattern.id == 'power' or pattern.id == 'shutter' or pattern.id == 'power_r',
         chain(*[model['ir_codes'] for model in models]))
     code_list = [
         {

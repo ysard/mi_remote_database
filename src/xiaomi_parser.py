@@ -270,10 +270,11 @@ def load_brand_codes(filename):
         1 model can have multiple codes including reverse codes.
         We asked power codes so, each code corresponds to this type.
     :type filename: <str>
-    :return: List of dictionnaries corresponding to the definitions of the codes for each model.
+    :return: List of dictionaries corresponding to the definitions of the codes for each model.
         1 dict per model.
-        Used keys from JSON: ir_zip_key, frequency, ir_zip_key, keysetids
-        (internal model id linked to the codes in database), _id, source, power, power_r.
+        Used keys from JSON: frequency, source, _id, keyid, ir_zip_key, ir_zip_key_r
+        Model dictionary is {buttons, (optional) source, (optional) _id, (optional) keysetids}
+        And for button dictionary is {id, ir_zip_key, frequency}
     :rtype: <list <dict>>
     """
 
@@ -387,8 +388,7 @@ def load_brand_codes_from_dir(directory):
 
     .. seealso:: :meth:`load_brand_codes`
 
-    :return: Dict with filenames as keys and list of dictionnaries corresponding
-        to the definitions of the codes as values.
+    :return: Dict with filenames as keys and list of model dictionaries
     :rtype: <dict <str>:<list <dict>>>
     """
     total = 0

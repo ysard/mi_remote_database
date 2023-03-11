@@ -16,6 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Entry point and argument parser"""
 import argparse
+from itertools import chain
 # Standard imports
 from pathlib import Path
 
@@ -38,7 +39,7 @@ def load_device_codes(device_directory):
 
     :param device_directory: Directory of a device (brands files are stored in it).
     :type device_directory: <str> or <Path>
-    :return: List of Pattern objects (wrappers for decrypted IR codes).
+    :return: List of model objects
     :rtype: <list <Pattern>>
     """
     # Extract encrypted codes from all the models these brands
@@ -52,9 +53,12 @@ def load_device_codes(device_directory):
                 "source": model.get("source", None),
                 "keysetids": model.get("keysetids", None)
             })
+    ir_codes = list(chain(*[chain(*model['ir_codes']) for model in models]))
 
     print("Nb brands:", len(models_per_brand))
     print("Nb models:", len(models))
+    print("Nb Patterns:", len(ir_codes))
+    print("Nb unique patterns:", len(set(ir_codes)))
     return models
 
 

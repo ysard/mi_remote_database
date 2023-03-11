@@ -243,7 +243,6 @@ def dump_database(db_path="./database_dump", *args, **kwargs):
         models_path = device_brands_path / "models/"
         models_path.mkdir(exist_ok=True)
 
-        # TODO: Fix it
         models = list(it.chain(*load_brand_codes_from_dir(device_brands_path).values()))
 
         # Only xiaomi models

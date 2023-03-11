@@ -136,6 +136,12 @@ A JSON file (`Xiaomi_TV.json`) will be exported with the following structure as 
         }
     ]
 
+
+Also available export for [Flipper Zero](https://github.com/flipperdevices/flipperzero-firmware)
+
+    $ python -m src db_export -d 1 -f flipper
+
+
 # Developers
 
 Functions are fully documented in the source code according to Python documentation standards;
