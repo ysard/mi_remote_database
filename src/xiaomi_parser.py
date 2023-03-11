@@ -168,7 +168,7 @@ def load_brand_list(filename):
     return brands
 
 
-def load_brand_codes(filename):
+def load_brand_codes(directory, filename):
     """Extract IR encrypted codes for each model from a given JSON dump of a brand
 
     {
@@ -263,10 +263,10 @@ def load_brand_codes(filename):
         TL;DR: Quickly, there is a filtering in this function which should not
         be done at this level.
 
-        If we really wanted to retrieve all models, we would only use keysetids
+        If we really wanted to retrieve all buttons, we would only use keysetids
         and _id/source fields.
 
-    :param filename: JSON file with the definitions of the models available for 1 brand.
+    :param filename: JSON file with the definitions of the buttons available for 1 brand.
         1 model can have multiple codes including reverse codes.
         We asked power codes so, each code corresponds to this type.
     :type filename: <str>
@@ -281,39 +281,24 @@ def load_brand_codes(filename):
         # TODO: filter on other keys than power/power_r/shutter
 
         for json_model in section:
-            power_code = json_model["key"].get("power")
-            # TODO: Exception for Cameras... See workaround above...
-            shutter_code = json_model["key"].get("shutter")
-            if not power_code and not shutter_code:
-                LOGGER.warning(
-                    "Key power/shutter NOT FOUND in 'others', id <%s>: %s",
-                    json_model["_id"], json_model["key"].keys(),
-                )
-                continue
+            buttons = [
+                {
+                    "id": name,
+                    "ir_zip_key": ircode,
+                    "frequency": json_model["frequency"]
+                }
+                for name, ircode in json_model["key"].items()
+            ]
 
-            model = {
-                # TODO: Ugly workaround: assign shutter if no power (for cameras)
-                "ir_zip_key": power_code if power_code else shutter_code,
-                "frequency": json_model["frequency"],
-                "_id": json_model["_id"],
-                "source": json_model["source"],
-            }
-
-            # Optional reverse code
-            reverse_code = json_model["key"].get("power_r")
-            if reverse_code:
-                model["ir_zip_key_r"] = reverse_code
-
-            yield model
+            yield buttons
 
     json_filedata = json.loads(Path(filename).read_text())
-    models = list()
+    buttons = list()
 
     if "others" in json_filedata["data"]:
         # "others" section is not considered for now
-        models += [
-            model for model in parse_others_section(json_filedata["data"]["others"])
-        ]
+        for other_buttons in parse_others_section(json_filedata["data"]["others"]):
+            buttons += other_buttons
 
     ############################################################################
 
@@ -321,23 +306,42 @@ def load_brand_codes(filename):
 
     if "seceret_key" not in tree:
         # Empty tree
-        return models
+        return buttons
 
     assert tree["seceret_key"] is None  # TODO: To be identified correctly later
     json_models = tree["nodes"]
-    for json_model in json_models[1:]:  # Skip the first element: "children_index"
-        model = {
+    for json_model in json_models:
+        if "ir_zip_key" not in json_model:
+            continue  # Skip the first element: "children_index"
+        main_button = {
+            "id": json_model["keyid"],
             "ir_zip_key": json_model["ir_zip_key"],
-            "frequency": json_model["frequency"],
-            "keysetids": json_model["keysetids"],  # Get list of compatible models
+            "frequency": json_model["frequency"]
         }
         # Optional reverse code
         reverse_code = json_model.get("ir_zip_key_r")
         if reverse_code:
-            model["ir_zip_key_r"] = reverse_code
+            main_button["ir_zip_key_r"] = reverse_code
 
-        models.append(model)
-    return models
+        buttons.insert(0, main_button)  # button at the head of the hierarchy has a higher priority
+        for keyset in json_model['keysetids']:
+            buttons += load_keyset_buttons(directory, keyset)
+    return buttons
+
+
+def load_keyset_buttons(directory, keyset):
+    json_filedata = json.loads(Path(str(directory) + '/models/' + keyset + '.json').read_text())
+    json_model = json_filedata["data"]
+    if 'key' not in json_model:
+        return []
+    return [
+        {
+            "id": name,
+            "ir_zip_key": ircode,
+            "frequency": json_model["frequency"]
+        }
+        for name, ircode in json_model["key"].items()
+    ]
 
 
 def build_patterns(models):
@@ -366,6 +370,7 @@ def build_patterns(models):
             frequency,
             model_id=model.get("_id", model.get("keysetids")),
             vendor_id=model.get("source", "mi"),
+            id=model.get("id", None)
         )
         # print(pattern.to_pronto())
         patterns.append(pattern)
@@ -374,11 +379,15 @@ def build_patterns(models):
         if "ir_zip_key_r" in model:
             # Decrypt IR code
             ir_code = process_xiaomi_shit(model["ir_zip_key_r"])
+            button_name = model.get("id", None)
+            if button_name is not None:
+                button_name = button_name + '_r'
             pattern = Pattern(
                 ir_code,
                 frequency,
                 model_id=model.get("_id", model.get("keysetids")),
                 vendor_id=model.get("source", "mi"),
+                id=button_name
             )
             # print(pattern.to_pronto())
             patterns.append(pattern)
@@ -400,7 +409,7 @@ def load_brand_codes_from_dir(directory):
     for json_file in Path(directory).glob("*.json"):
         print(json_file, "...", end="")
         # Load codes from models in this brand file
-        temp_models = load_brand_codes(json_file)
+        temp_models = load_brand_codes(directory, json_file)
         models[json_file.stem] = temp_models
         print(len(temp_models))
         total += len(temp_models)

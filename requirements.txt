@@ -1,3 +1,4 @@
 pycryptodome>=3.5.0
 argparse
 pytest
+requests

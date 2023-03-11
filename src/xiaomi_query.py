@@ -23,7 +23,7 @@ from random import shuffle
 
 # Custom imports
 from .crypt_utils import build_url
-from .xiaomi_parser import load_devices, load_brand_list, load_brand_codes_from_dir, build_patterns
+from .xiaomi_parser import load_devices, load_brand_list, load_brand_codes_from_dir
 
 
 def get_json_devices():
@@ -246,6 +246,7 @@ def dump_database(db_path="./database_dump", *args, **kwargs):
         device_name = device["name"]
         device_brands_path = Path(f"{db_path}/{device_id}_{device_name}")
 
+        # TODO: fix query
         # Only xiaomi models
         models = list(it.chain(*load_brand_codes_from_dir(device_brands_path).values()))
         mi_models = set(

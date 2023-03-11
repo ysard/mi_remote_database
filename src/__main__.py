@@ -21,6 +21,7 @@ import json
 from pathlib import Path
 import argparse
 
+from .exports import flipper_export, tvkill_export
 # Custom imports
 from .xiaomi_parser import load_brand_codes, load_brand_codes_from_dir, build_patterns
 from .xiaomi_query import dump_database, load_devices
@@ -45,15 +46,17 @@ def load_device_codes(device_directory):
     """
     # Extract encrypted codes from all the models these brands
     models_per_brand = load_brand_codes_from_dir(device_directory)
-    models = list(it.chain(*models_per_brand.values()))
-    # Get Patterns from clear IR codes
-    ir_codes = build_patterns(models)
+    decrypted = [
+        {
+            "brand": brand,
+            # Get Patterns from clear IR codes
+            "ir_codes": build_patterns(buttons)
+        }
+        for brand, buttons in models_per_brand.items()
+    ]
 
     print("Nb brands:", len(models_per_brand))
-    print("Nb models:", len(models))
-    print("Nb Patterns:", len(ir_codes))
-    print("Nb unique patterns:", len(set(ir_codes)))
-    return ir_codes
+    return decrypted
 
 
 def db_export(deviceid=None, format=None, list_devices=False, db_path=None):
@@ -75,38 +78,23 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None):
     if len(directory) != 1:
         LOGGER.error("Missing or Wrong directory %s", directory)
 
+    output_path = Path('output')
+    if not output_path.exists():
+        output_path.mkdir()
+
     # Build export filename based on device name
-    export_filename = "Xiaomi " + device_mapping[deviceid]
+    export_filename = str(output_path) + "/" + device_mapping[deviceid]
 
     # Load codes from directory
     ir_patterns = load_device_codes(directory[0])
 
     if format == "tvkill":
         tvkill_export(ir_patterns, export_filename)
+    elif format == "flipper":
+        flipper_export(ir_patterns, export_filename)
     else:
         LOGGER.error("To be implemented")
         raise NotImplementedError
-
-
-def tvkill_export(patterns, export_filename):
-    """Export Pattern objects to JSON data for TV Kill app
-
-    .. note:: Unique patterns are used to reduce overhead.
-    """
-    code_list = [
-        {
-            "comment": "{} {}".format(code.vendor_id, code.model_id),
-            "frequency": code.frequency,
-            "pattern": code.to_pulses(),
-        }
-        for code in set(patterns)
-    ]
-    tvkill_patterns = {
-        "designation": export_filename,
-        "patterns": code_list,
-    }
-    json_data = json.dumps([tvkill_patterns])  # , indent=2)
-    Path(export_filename.replace(" ", "_") + ".json").write_text(json_data)
 
 
 def args_to_param(args):

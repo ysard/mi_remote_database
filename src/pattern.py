@@ -58,15 +58,17 @@ class Pattern:
     Python sets can be made to ensure the uniqueness of Pattern objects.
     """
 
-    def __init__(self, ir_code, frequency=None, code_type="raw", model_id=None, vendor_id=None):
+    def __init__(self, ir_code, frequency=None, code_type="raw", model_id=None, vendor_id=None, id=None):
         """
         :param ir_code: IR code; Raw timmings by default. If different type,
             set `code_type` argument.
         :key frequency: Optional for Pronto codes only; Mandatory for the others.
         :key code_type: (Optional) `pronto, pulses, raw`. Default: `raw`.
+        :key id: (Optional) name for pattern
         :type ir_code: <Iterable <int>> or <str>
         :type frequency: <int>
         :type code_type: <str>
+        :type id: <str>
         """
         convert_funcs = {
             "pronto": self.from_pronto,
@@ -82,6 +84,7 @@ class Pattern:
         self.code_type = code_type
         self.from_bytes = partial(int.from_bytes, byteorder="big")
         self.ir_code, self.frequency = convert_funcs[code_type](ir_code, frequency)
+        self.id = id
 
     def to_pronto(self):
         """Pronto IR format
