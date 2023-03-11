@@ -288,17 +288,18 @@ def load_brand_codes(filename):
                 for name, ircode in json_model["key"].items()
             ]
 
-            yield buttons, json_model["source"]
+            yield buttons, json_model["source"], json_model["_id"]
 
     json_filedata = json.loads(Path(filename).read_text())
     models = list()
 
     if "others" in json_filedata["data"]:
         # "others" section is not considered for now
-        for other_buttons, source in parse_others_section(json_filedata["data"]["others"]):
+        for other_buttons, source, other_id in parse_others_section(json_filedata["data"]["others"]):
             models.append({
                 'buttons': other_buttons,
-                'source': source
+                'source': source,
+                '_id': other_id
             })
 
     ############################################################################

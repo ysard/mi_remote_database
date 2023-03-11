@@ -190,7 +190,7 @@ def full_process_device(output_directory, json_device_brands_path):
     :type json_device_brands_path: <Path>
     """
     # Load list of brands
-    brands, keysets = load_brand_list(json_device_brands_path)
+    brands = load_brand_list(json_device_brands_path)
     # Query data for all brands if dir is empty
     output_directory.mkdir(exist_ok=True)
     # Download brands
@@ -244,7 +244,7 @@ def dump_database(db_path="./database_dump", *args, **kwargs):
         models_path.mkdir(exist_ok=True)
 
         # TODO: Fix it
-        models = load_brand_codes_from_dir(device_brands_path)
+        models = list(it.chain(*load_brand_codes_from_dir(device_brands_path).values()))
 
         # Only xiaomi models
         mi_models = set(
