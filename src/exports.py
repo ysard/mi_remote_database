@@ -44,11 +44,14 @@ def load_keyset_codes(directory, keyset):
     return build_patterns(ir_codes)
 
 
-def tvkill_export(patterns, export_filename):
+def tvkill_export(models, export_filename):
     """Export Pattern objects to JSON data for TV Kill app
 
     .. note:: Unique patterns are used to reduce overhead.
     """
+    patterns = filter(
+        lambda pattern: pattern.id == 'power' or pattern.id == 'shutter',
+        chain(*[model['ir_codes'] for model in models]))
     code_list = [
         {
             "comment": "{} {}".format(code.vendor_id, code.model_id),
