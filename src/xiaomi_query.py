@@ -24,6 +24,9 @@ from random import shuffle
 # Custom imports
 from .crypt_utils import build_url
 from .xiaomi_parser import load_devices, load_brand_list, load_brand_codes_from_dir, build_patterns
+from .commons import logger
+
+LOGGER = logger()
 
 
 def get_json_devices():
@@ -123,13 +126,13 @@ def crawl_brands(output_directory, brands):
             continue
 
         # Query the API for the given brand id
-        print(f"Begin {index}/{total}: {brand_name} {brand_id}")
+        LOGGER.info(f"Begin {index}/{total}: {brand_name} {brand_id}")
         json_data = get_json_brand(brand_id, device_id)
 
         # Dump the result
         filepath.write_text(json_data)
 
-        print("Done:", brand_id)
+        LOGGER.info("Done: %s", brand_id)
         # Do not be too harsh with the server...
         time.sleep(0.4)
 
@@ -160,13 +163,13 @@ def crawl_models(output_directory, model_ids, vendorid="mi"):
         if filepath.exists():
             continue
         # Query the API for the given brand id
-        print(f"Begin {index}/{total}: {model_id}")
+        LOGGER.info(f"Begin {index}/{total}: {model_id}")
         json_data = get_json_model(model_id, vendorid=vendorid)
 
         # Dump the result
         filepath.write_text(json_data)
 
-        print("Done:", model_id)
+        LOGGER.info("Done: %s", model_id)
         # Do not be too harsh with the server...
         time.sleep(0.4)
         # input("pause")
@@ -261,7 +264,7 @@ def dump_database(db_path="./database_dump", *args, **kwargs):
         ]
 
         for vendor, model_ids in zip(other_models, model_id_sets):
-            print(model_ids)
+            LOGGER.info(model_ids)
             crawl_models(models_path, model_ids, vendorid=vendor)
 
 
