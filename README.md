@@ -40,11 +40,10 @@ The number of patterns for other commands **is much more important**.
     Nb unique patterns: 577
 
     Fans:
-    Nb brands: 1060
-    Nb models: 2634
-    Nb Patterns: 2998
-    Nb unique patterns: 1290
-
+    Nb brands: 133
+    Nb models: 417
+    Nb Patterns: 434
+    Nb unique patterns: 191
 
     Audio/video:
     Nb brands: 202
