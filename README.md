@@ -87,7 +87,7 @@ Dump the database (If you don't want to use the one that is available in the Git
 
     $ python -m src db_dump
     # or just:
-    $ make
+    $ make db_dump
 
 Have coffee in the meantime... Files are in the directory `./database_dump` by default.
 
