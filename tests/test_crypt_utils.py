@@ -21,7 +21,7 @@ def test_get_opaque_http_param(url_path, expected_opaque):
     assert expected_opaque == found_opaque
 
 
-# Mock builtin random functions
+# Mock builtin random functions for test reproducibility
 @patch("src.crypt_utils.randint")
 @patch("time.time")
 def test_build_url(mock_time, mock_randint):
