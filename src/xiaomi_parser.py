@@ -272,7 +272,7 @@ def load_brand_codes(filename):
     :type filename: <str>
     :return: List of dictionnaries corresponding to the definitions of the codes for each model.
         1 dict per model.
-        Used keys from JSON: ir_zip_key, frequency, ir_zip_key, keysetids
+        Used keys from JSON: ir_zip_key, frequency, ir_zip_key_r, keysetids
         (internal model id linked to the codes in database), _id, source, power, power_r.
     :rtype: <list <dict>>
     """

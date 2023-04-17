@@ -22,9 +22,8 @@ from pathlib import Path
 import argparse
 
 # Custom imports
-from .xiaomi_parser import load_brand_codes, load_brand_codes_from_dir, build_patterns
+from .xiaomi_parser import load_brand_codes_from_dir, build_patterns
 from .xiaomi_query import dump_database, load_devices
-from .pattern import Pattern
 import src.commons as cm
 
 LOGGER = cm.logger()
