@@ -13,7 +13,8 @@ KEY = "581582928c881b42eedce96331bff5d3"
         ("/controller/match/tree/1?version=6034&country=FR&ts=1615406520766&nonce=-745784427&devid=1&miyk=1&brandid=64&power=1", "ca532688afb979158cc1fc511e36af666dba061b"),
         ("/controller/code/1?version=6034&country=FR&ts=1615406532233&nonce=-1591647351&matchid=xm_1_199&vendor=mi", "b2138842dc4a2b05f1e45d4822dfbdc2fe25a407"),
         ("/controller/device/1?version=6034&country=FR&ts=1615423170&nonce=-3909276&devid=1&miyk=1&brandid=64&power=1", "ad96c3766aa7b3f3069236f65199921f8ea9db24")
-    ]
+    ],
+    ids=["url_brand_tree", "url_model_code", "url_devices"]
 )
 def test_get_opaque_http_param(url_path, expected_opaque):
     """Test opaque parameter for the given url path"""
