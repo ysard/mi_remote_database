@@ -10,11 +10,19 @@ KEY = "581582928c881b42eedce96331bff5d3"
 @pytest.mark.parametrize(
     "url_path, expected_opaque",
     [
+        # Standard devices
         ("/controller/match/tree/1?version=6034&country=FR&ts=1615406520766&nonce=-745784427&devid=1&miyk=1&brandid=64&power=1", "ca532688afb979158cc1fc511e36af666dba061b"),
         ("/controller/code/1?version=6034&country=FR&ts=1615406532233&nonce=-1591647351&matchid=xm_1_199&vendor=mi", "b2138842dc4a2b05f1e45d4822dfbdc2fe25a407"),
-        ("/controller/device/1?version=6034&country=FR&ts=1615423170&nonce=-3909276&devid=1&miyk=1&brandid=64&power=1", "ad96c3766aa7b3f3069236f65199921f8ea9db24")
+        ("/controller/device/1?version=6034&country=FR&ts=1615406505554&nonce=1126639370", "f422f7bdc77403414fdd674758af0b39435bb46e"),
+        # Set-top box devices
+        # brandid replaced by spid
+        ("/controller/match/tree/1?version=6329&country=IN&ts=1667318152151&nonce=-20782770&devid=2&miyk=1&spid=in100&power=1", "5a31c79439f2314a2ff935fd852eb5172c9316ed"),
+        ("/controller/stb/lineup/match/1?version=6329&country=IN&ts=1667318148341&nonce=871222104", "c9f3ffc28ac586207772e11bcd909ead2b339f3a"),
     ],
-    ids=["url_brand_tree", "url_model_code", "url_devices"]
+    ids=[
+        "url_brand_tree", "url_model_code", "url_devices",
+        "url_lineup_tree", "url_stb_lineup",
+    ]
 )
 def test_get_opaque_http_param(url_path, expected_opaque):
     """Test opaque parameter for the given url path"""
