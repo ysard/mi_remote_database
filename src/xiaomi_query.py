@@ -246,11 +246,9 @@ def dump_database(db_path="./database_dump", *args, **kwargs):
         models_path = device_brands_path / "models/"
         models_path.mkdir(exist_ok=True)
 
-        device_name = device["name"]
-        device_brands_path = Path(f"{db_path}/{device_id}_{device_name}")
+        models = list(it.chain(*load_brand_codes_from_dir(device_brands_path).values()))
 
         # Only xiaomi models
-        models = list(it.chain(*load_brand_codes_from_dir(device_brands_path).values()))
         mi_models = set(
             it.chain(*[model["keysetids"] for model in models if "keysetids" in model])
         )
