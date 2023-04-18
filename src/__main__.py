@@ -78,7 +78,9 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
     db_dir = found_dirs[0] if len(found_dirs) == 1 else None
 
     if not db_dir:
-        LOGGER.error("Missing device files or wrong directory: %s/%s_*/", db_path, deviceid)
+        LOGGER.error(
+            "Missing device files or wrong directory: %s/%s_*/", db_path, deviceid
+        )
         exit(1)
 
     # Build export filename based on device name
@@ -88,13 +90,13 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
     ir_patterns = load_device_codes(db_dir)
 
     if format == "tvkill":
-        tvkill_export(ir_patterns, export_filename)
+        tvkill_export(ir_patterns, output, export_filename)
     else:
         LOGGER.error("To be implemented")
         raise NotImplementedError
 
 
-def tvkill_export(patterns, export_filename):
+def tvkill_export(patterns, output, export_filename):
     """Export Pattern objects to JSON data for TV Kill app
 
     .. note:: Unique patterns are used to reduce overhead.
@@ -112,7 +114,9 @@ def tvkill_export(patterns, export_filename):
         "patterns": code_list,
     }
     json_data = json.dumps([tvkill_patterns])  # , indent=2)
-    Path(export_filename.replace(" ", "_") + ".json").write_text(json_data)
+    (Path(output) / Path(export_filename.replace(" ", "_") + ".json")).write_text(
+        json_data
+    )
 
 
 def args_to_param(args):
