@@ -114,7 +114,7 @@ def tvkill_export(patterns, output, export_filename):
         "patterns": code_list,
     }
     json_data = json.dumps([tvkill_patterns])  # , indent=2)
-    (Path(output) / Path(export_filename.replace(" ", "_") + ".json")).write_text(
+    Path(output, export_filename.replace(" ", "_") + ".json").write_text(
         json_data
     )
 
