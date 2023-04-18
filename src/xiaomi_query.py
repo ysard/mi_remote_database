@@ -257,7 +257,7 @@ def dump_database(db_path="./database_dump", *args, **kwargs):
         crawl_models(models_path, mi_models)
 
         # Create sets of model ids for each "others" vendor
-        other_models = ("kk", "mx", "yk")
+        other_models = ("kk", "mx", "xm", "yk")
         model_id_sets = [
             {model["_id"] for model in models if model.get("source") == vendor}
             for vendor in other_models
