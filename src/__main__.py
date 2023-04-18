@@ -130,26 +130,31 @@ def main():
     # Default log level: info
     parser.add_argument("-vv", "--verbose", nargs="?", default="info")
 
+    # Parent subparser: All subparsers will inherit of this argument
+    parent_parser = argparse.ArgumentParser(add_help=False)
+    parent_parser.add_argument(
+        "-p",
+        "--db_path",
+        help="Path of database dump",
+        default="./database_dump",
+        type=dir_path,
+    )
     # Subparsers
     subparsers = parser.add_subparsers(title="subcommands")
 
     # Database dump
     parser_db_dump = subparsers.add_parser(
         "db_dump",
+        parents=[parent_parser],
         help=dump_database.__doc__,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser_db_dump.set_defaults(func=dump_database)
-    parser_db_dump.add_argument(
-        "-o",
-        "--output",
-        help="Output directory",
-        default="./database_dump",
-    )
 
     # Export
     parser_export = subparsers.add_parser(
         "db_export",
+        parents=[parent_parser],
         help=db_export.__doc__,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -169,10 +174,11 @@ def main():
         action="store_true"
     )
     parser_export.add_argument(
-        "-p",
-        "--db_path",
-        help="Path of database dump",
-        default="./database_dump",
+        "-o",
+        "--output",
+        help="Output directory",
+        default=".",
+        type=dir_path,
     )
 
     # Get program args and launch associated command
