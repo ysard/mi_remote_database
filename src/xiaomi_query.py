@@ -23,7 +23,7 @@ from random import shuffle
 
 # Custom imports
 from .crypt_utils import build_url
-from .xiaomi_parser import load_devices, load_brand_list, load_brand_codes_from_dir, build_patterns
+from .xiaomi_parser import load_devices, load_brand_list, load_brand_codes_from_dir
 from .commons import logger
 
 LOGGER = logger()

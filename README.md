@@ -160,7 +160,7 @@ One pulse is the number of cycles of the carrier for which to turn the
 emitter light ON or OFF. Pulses are used for IR transmission based on PWM
 (Pulses Width Modulation) where the carrier frequency acts as a clock.
 
-Timmings are expressed in microseconds (us),
+Timmings are expressed in microseconds (us or µs),
 Burst/pulse values are expressed in number of cycles of the carrier for which
 to turn the light on and off.
 
