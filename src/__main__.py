@@ -117,6 +117,13 @@ def args_to_param(args):
     return {k: v for k, v in vars(args).items() if k not in ("func", "verbose")}
 
 
+def dir_path(path):
+    """Test existence of the given directory"""
+    if Path(path).is_dir():
+        return path.rstrip("/")
+    raise argparse.ArgumentTypeError(f"{path} is not a valid directory.")
+
+
 def main():
     """Entry point and argument parser"""
     parser = argparse.ArgumentParser()
