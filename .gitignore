@@ -1,3 +1,10 @@
+# Various dirs & files
+poc/
+.idea/
+*.json
+*.tar.gz
+*.tar.xz
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
