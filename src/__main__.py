@@ -22,8 +22,8 @@ from pathlib import Path
 import argparse
 
 # Custom imports
-from .xiaomi_parser import load_brand_codes_from_dir, build_patterns
-from .xiaomi_query import dump_database, load_devices
+from src.xiaomi_parser import load_brand_codes_from_dir, build_patterns
+from src.xiaomi_query import dump_database, load_devices
 import src.commons as cm
 
 LOGGER = cm.logger()
@@ -70,8 +70,9 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
     # Display available devices if asked
     if list_devices:
         print("Device Name: Device ID")
-        [print(f"{v}: {k}") for k, v in device_mapping.items()]
-        exit(0)
+        for dev_name, dev_id in device_mapping.items():
+            print(f"{dev_name}: {dev_id}")
+        raise SystemExit(0)
 
     # Expect directory <db_dir>/<int>_<device_name>/
     found_dirs = [p for p in Path(db_path).glob(f"{deviceid}_*") if p.is_dir()]
@@ -81,7 +82,7 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
         LOGGER.error(
             "Missing device files or wrong directory: %s/%s_*/", db_path, deviceid
         )
-        exit(1)
+        raise SystemExit(1)
 
     # Build export filename based on device name
     export_filename = f"{format} Xiaomi_" + device_mapping[deviceid]
@@ -197,10 +198,10 @@ def main():
     if "func" not in dir(args):
         # Nor argument
         parser.print_usage()
-        exit(1)
+        raise SystemExit(1)
 
     args.func(**args_to_param(args))
 
 
-if "__main__" == __name__:
+if __name__ == "__main__":
     main()
