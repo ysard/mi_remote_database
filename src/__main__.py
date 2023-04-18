@@ -82,7 +82,7 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
         exit(1)
 
     # Build export filename based on device name
-    export_filename = "Xiaomi " + device_mapping[deviceid]
+    export_filename = f"{format} Xiaomi_" + device_mapping[deviceid]
 
     # Load codes from directory
     ir_patterns = load_device_codes(db_dir)
