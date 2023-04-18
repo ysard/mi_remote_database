@@ -57,6 +57,10 @@ def load_device_codes(device_directory):
 
 def db_export(deviceid=None, format=None, list_devices=False, db_path=None):
     """Export data to (various ?) formats"""
+    if deviceid == 2:
+        LOGGER.error("To be implemented; Set-top box isn't supported for now; See #1")
+        raise NotImplementedError
+
     # Load devices ids/names mapping
     device_mapping = {
         k: v["name"] for k, v in

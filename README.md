@@ -99,7 +99,7 @@ List the known devices types in the dump:
     $ python -m src db_export -l
     Device Name: Device ID
     TV: 1
-    Set-top box: 2
+    Set-top box: 2  <= Not supported for now (help wanted to reverse this part)
     AC: 3
     Fan: 6
     Box: 12
