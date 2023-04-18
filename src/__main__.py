@@ -55,7 +55,7 @@ def load_device_codes(device_directory):
     return ir_codes
 
 
-def db_export(deviceid=None, format=None, list_devices=False, db_path=None):
+def db_export(deviceid=None, format=None, list_devices=False, db_path=None, output=None):
     """Export data to (various ?) formats"""
     if deviceid == 2:
         LOGGER.error("To be implemented; Set-top box isn't supported for now; See #1")
@@ -74,15 +74,18 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None):
         exit(0)
 
     # Expect directory <db_dir>/<int>_<device_name>/
-    directory = [p for p in Path(db_path).glob(f"{deviceid}_*") if p.is_dir()]
-    if len(directory) != 1:
-        LOGGER.error("Missing or Wrong directory %s", directory)
+    found_dirs = [p for p in Path(db_path).glob(f"{deviceid}_*") if p.is_dir()]
+    db_dir = found_dirs[0] if len(found_dirs) == 1 else None
+
+    if not db_dir:
+        LOGGER.error("Missing device files or wrong directory: %s/%s_*/", db_path, deviceid)
+        exit(1)
 
     # Build export filename based on device name
     export_filename = "Xiaomi " + device_mapping[deviceid]
 
     # Load codes from directory
-    ir_patterns = load_device_codes(directory[0])
+    ir_patterns = load_device_codes(db_dir)
 
     if format == "tvkill":
         tvkill_export(ir_patterns, export_filename)
