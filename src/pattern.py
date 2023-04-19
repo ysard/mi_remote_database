@@ -202,7 +202,7 @@ class Pattern:
         ]
 
     def to_pulses(self):
-        """Pulses (number of cycles of the carrier for which to turn the light ON and off
+        """Pulses (number of cycles of the carrier for which to turn the light ON and OFF)
         Pulses Width Modulation"""
         return [round((i * self.frequency) / 1000000) for i in self.ir_code]
 
