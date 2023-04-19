@@ -152,6 +152,18 @@ moreover, some examples are available in unit tests.
     │   │   │   ├── 1_8582.json # "Model" file: Definitions of all IR codes known for one model
     │   │   │   ├── ...
 
+## Online API description & flowchart
+
+```{mermaid}
+
+    flowchart TD
+        A[Get devices] --> |/controller/device/1| B{Is Set-top box device?}
+        B --> |No| C[Get all brands] --> |/controller/brand/list/1| D[Get brand]
+        B --> |Yes| E[Get all set-topbox brands] --> |/controller/stb/lineup/match/1| D
+        D --> |/controller/match/tree/1| G[Get models]
+        G --> |/controller/code/1| H[done]
+```
+
 ## Pattern object
 
 Pattern is a wrapper for IR pulses format.
