@@ -184,6 +184,47 @@ def load_brand_list(filename):
     return brands
 
 
+def load_stp_brand_list(filename):
+    """Get brands from JSON dump of set-top box devices
+
+    Here, the `sp` key is assimilated to the `brandid` usually adopted
+    everywhere else in the API.
+
+    Data example:
+
+    {"status":0,"data":{
+        "count":52,"data":[
+            {
+                "type":0,"matchs":[],"sp":"in112","s_tpbrand":94,
+                "name":"ACT Digital", "_id":"in_lu_112"
+            },
+            {
+                "type":0,"matchs":[],"sp":"in100","s_tpbrand":93,
+                "name":"Airtel","_id":"in_lu_100"
+            }
+            ...
+        ]
+    }}
+
+    :param filename: JSON file with the definitions of the available brands
+    :type filename: <str>
+    :return: Dictionary of sp ids as keys, dict of names and device ids as values.
+        Used keys from JSON: brandid, deviceid, name
+    :rtype: <dict <str>:<dict>>
+    """
+    json_filedata = json.loads(Path(filename).read_text())
+
+    brands = dict()
+    json_brands = json_filedata["data"]["data"]
+    for brand in json_brands:
+        # print(brand["name"], brand["sp"], type(brand["sp"]))
+        brands[brand["sp"]] = {
+            "name": brand["name"],
+            "deviceid": 2,
+        }
+    return brands
+
+
 def load_brand_codes(filename):
     """Extract IR encrypted codes for each model from a given JSON dump of a brand
 
