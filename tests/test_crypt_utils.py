@@ -41,7 +41,6 @@ def test_build_url(mock_time, mock_randint):
 
     # Toshiba TV
     url = build_url(
-        "https://sg-urc.io.mi.com",
         "/controller/match/tree/1",
         [("devid", 1), ("miyk", 1), ("brandid", 64), ("power", 1)],
         no_execute=True,
@@ -55,7 +54,6 @@ def test_build_url(mock_time, mock_randint):
 
     # Sony camera
     url = build_url(
-        "https://sg-urc.io.mi.com",
         "/controller/code/1",
         [("matchid", "kk_13_141_12147"), ("vendor", "kk")],
         no_execute=True,
