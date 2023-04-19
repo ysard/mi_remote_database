@@ -157,7 +157,13 @@ def load_brand_list(filename):
        "language":"ZH_CN"
     }
 
-    Extract deviceid: 1 = TV, 10 = projectors, etc.
+    Example of data returned:
+
+    {
+        84: {"name":"Canon", "deviceid":13},
+        2051: {"name":"Nikon", "deviceid":13}
+    }
+    Where 84 and 2051 are the brand ids.
 
     :param filename: JSON file with the definitions of the available brands
     :type filename: <str>
