@@ -171,7 +171,7 @@ def crawl_models(output_directory, model_ids, vendorid="mi"):
         vendorid. Ids are extracted from brand files for a specific device.
         .. seealso:: :meth:`load_brand_codes_from_dir`
     :key vendorid: (Optional) Id of the vendor for which the models are queried.
-        Possible ids (known until now): `mi (default), kk, mx, yk`.
+        Possible ids (known until now): `mi (default), kk, mx, xm, yk`.
     :type output_directory: <str> or <Path>
     :type model_ids: <set <str>>
     :type vendorid: <str>
@@ -189,7 +189,7 @@ def crawl_models(output_directory, model_ids, vendorid="mi"):
         # Dump the result
         filepath.write_text(json_data)
 
-        LOGGER.info("Done: %s", model_id)
+        LOGGER.debug("Done: %s", model_id)
         # Do not be too harsh with the server...
         time.sleep(0.4)
         # input("pause")
@@ -248,10 +248,10 @@ def dump_database(*_args, db_path="./database_dump", **_kwargs):
         if not json_device_brands_path.is_file():
             if stb_device:
                 # Handle set-top box devices
-                content = get_json_stb_brands()
+                json_data = get_json_stb_brands()
             else:
-                content = get_json_brands(device_id)
-            Path(json_device_brands_path).write_text(content)
+                json_data = get_json_brands(device_id)
+            Path(json_device_brands_path).write_text(json_data)
 
         device_brands_path = Path(f"{db_path}/{device_id}_{device_name}")
         device_brands_path.mkdir(exist_ok=True)
