@@ -26,6 +26,12 @@ The number of patterns for other commands **is much more important**.
     Nb Patterns: 2998
     Nb unique patterns: 1290
 
+    Set-top box:
+    Nb brands: 43
+    Nb models: 152
+    Nb Patterns: 169
+    Nb unique patterns: 117
+
     Air conditioners:
     Nb brands: 280
     Nb models: 67
