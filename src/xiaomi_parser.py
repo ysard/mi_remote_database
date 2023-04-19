@@ -36,18 +36,34 @@ def load_devices(filename):
     """Get devices from JSON dump
 
     TODO: what are providers ?
+
+    Example of data returned:
+
+    {
+        1: {'name': 'TV'}, 2: {'name': 'Set-top box'}, 3: {'name': 'AC'},
+        6: {'name': 'Fan'}, 12: {'name': 'Box'}, 8: {'name': 'A_V receiver'},
+        4: {'name': 'DVD'}, 10: {'name': 'Projector'},
+        11: {'name': 'Cable _ Satellite box'}, 13: {'name': 'Camera'}
+    }
+
+    Other keys are available but not used/returned. See `devices.json` file.
+
+    :return: Dictionary of devices, with numerical ids as keys and dict of
+        device description as values.
+    :rtype: <dict <int>: <dict>>
     """
     json_filedata = json.loads(Path(filename).read_text())
     devices = dict()
 
     for json_device in json_filedata["data"]:
         info = json_device["info"]
+        # Get only the english name of the device
         device_name = [item["name"] for item in info if item["country"] == "EN"][0]
         device_id = json_device["deviceid"]
+        # Fix further errors with paths...
         devices[device_id] = {
-            "name": device_name.replace("/", "_")  # Fix further errors with paths...
+            "name": device_name.replace("/", "_")
         }
-
     return devices
 
 

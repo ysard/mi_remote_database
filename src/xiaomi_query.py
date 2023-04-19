@@ -213,13 +213,8 @@ def dump_database(db_path="./database_dump", *args, **kwargs):
         Path(json_devices_path).write_text(get_json_devices())
 
     # TODO: 2: {'name': 'Set-top box'} doesn't use the standard URL
+    # Data ex: {1: {'name': 'TV'}, ...}
     devices = {k: v for k, v in load_devices(json_devices_path).items() if k != 2}
-
-    # devices = {1: {'name': 'TV'}, 10: {'name': 'Projector'}}
-    # devices = {1: {'name': 'TV'}, 3: {'name': 'AC'},
-    #  6: {'name': 'Fan'}, 12: {'name': 'Box'}, 8: {'name': 'A_V receiver'},
-    #  4: {'name': 'DVD'}, 10: {'name': 'Projector'},
-    #  11: {'name': 'Cable _ Satellite box'}, 13: {'name': 'Camera'}}
 
     # Get brands
     for device_id, device in devices.items():
