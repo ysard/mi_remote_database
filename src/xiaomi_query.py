@@ -23,7 +23,12 @@ from random import shuffle
 
 # Custom imports
 from .crypt_utils import build_url
-from .xiaomi_parser import load_devices, load_brand_list, load_stp_brand_list, load_brand_codes_from_dir
+from .xiaomi_parser import (
+    load_devices,
+    load_brand_list,
+    load_stp_brand_list,
+    load_brand_codes_from_dir,
+)
 from .commons import logger
 
 LOGGER = logger()
@@ -141,7 +146,7 @@ def crawl_brands(output_directory, brands, stb=False):
             continue
 
         # Query the API for the given brand id
-        LOGGER.info(f"Begin {index}/{total}: {brand_name} {brand_id}")
+        LOGGER.info("Begin %d/%d: %s %s", index, total, brand_name, brand_id)
         json_data = get_json_brand(brand_id, device_id, stb=stb)
 
         # Dump the result
@@ -178,7 +183,7 @@ def crawl_models(output_directory, model_ids, vendorid="mi"):
         if filepath.exists():
             continue
         # Query the API for the given brand id
-        LOGGER.info(f"Begin {index}/{total}: {model_id}")
+        LOGGER.info("Begin %d/%d: %s", index, total, model_id)
         json_data = get_json_model(model_id, vendorid=vendorid)
 
         # Dump the result
@@ -218,7 +223,7 @@ def full_process_device(output_directory, json_device_brands_path, stb=False):
     crawl_brands(output_directory, brands, stb=stb)
 
 
-def dump_database(db_path="./database_dump", *args, **kwargs):
+def dump_database(*_args, db_path="./database_dump", **_kwargs):
     """Dump all the database into the given directory
 
     - get all devices: mapping deviceid/device type
@@ -230,15 +235,14 @@ def dump_database(db_path="./database_dump", *args, **kwargs):
     if not json_devices_path.is_file():
         Path(json_devices_path).write_text(get_json_devices())
 
-    # TODO: 2: {'name': 'Set-top box'} doesn't use the standard URL
     # Data ex: {1: {'name': 'TV'}, ...}
-    devices = {k: v for k, v in load_devices(json_devices_path).items()}
+    devices = load_devices(json_devices_path)
 
     # Get brands
     for device_id, device in devices.items():
         device_name = device["name"]
         json_device_brands_path = Path(f"{db_path}/{device_id}_{device_name}.json")
-        stb_device = (device_id == 2)
+        stb_device = device_id == 2
 
         # Get available brands per deviceid
         if not json_device_brands_path.is_file():
