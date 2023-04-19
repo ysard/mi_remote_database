@@ -34,7 +34,7 @@ def get_json_devices():
 
     `/controller/device/1?version=6034&country=FR&ts=1234&nonce=-1234&opaque=XXX`
     """
-    return build_url("https://sg-urc.io.mi.com", "/controller/device/1", [])
+    return build_url("/controller/device/1", [])
 
 
 def get_json_brands(device_id):
@@ -43,7 +43,7 @@ def get_json_brands(device_id):
     `/controller/brand/list/1?version=6034&country=FR&ts=1234&nonce=1234&devid=1&opaque=XXX`
     """
     return build_url(
-        "https://sg-urc.io.mi.com", "/controller/brand/list/1", [("devid", device_id)]
+        "/controller/brand/list/1", [("devid", device_id)]
     )
 
 
@@ -65,7 +65,6 @@ def get_json_brand(brand_id, device_id):
     :rtype: <str>
     """
     return build_url(
-        "https://sg-urc.io.mi.com",
         "/controller/match/tree/1",
         [("devid", device_id), ("miyk", 1), ("brandid", brand_id), ("power", 1)],
     )
@@ -91,7 +90,6 @@ def get_json_model(matchid, vendorid="mi"):
     :rtype: <str>
     """
     return build_url(
-        "https://sg-urc.io.mi.com",
         "/controller/code/1",
         [("matchid", matchid), ("vendor", vendorid)],
     )

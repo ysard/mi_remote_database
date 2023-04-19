@@ -100,7 +100,7 @@ def get_signature(plain_text, secret_key):
     return cipher.update(plain_text.encode()).hexdigest()
 
 
-def build_url(server, url_prefix, params, country="FR", no_execute=False):
+def build_url(url_prefix, params, server="https://sg-urc.io.mi.com", country="FR", no_execute=False):
     """Build and execute an URL for the API
 
     The built is based on the implementation of an anti-replay attack protection.
@@ -112,13 +112,15 @@ def build_url(server, url_prefix, params, country="FR", no_execute=False):
         `accept-encoding: gzip`
         `user-agent: okhttp/3.8.0`
 
-    :param server: Server name
     :param url_prefix: Fixed part of the url (without server name)
     :param params: List of http parameters
     :param country: 2 letters country code. Some IR codes may be localized like CN ones.
+    :key server: Server url
     :key no_execute: (Optional) Don't execute the query, just return the URL string.
         Default: False.
+    :type url_prefix: <str>
     :type params: <list <tuples>>
+    :type server: <str>
     :type country: <str>
     :type no_execute: <boolean>
     :return:
