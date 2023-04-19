@@ -46,13 +46,13 @@ def load_device_codes(device_directory):
     models_per_brand = load_brand_codes_from_dir(device_directory)
     models = list(it.chain(*models_per_brand.values()))
     # Get Patterns from clear IR codes
-    ir_codes = build_patterns(models)
+    patterns = build_patterns(models)
 
     print("Nb brands:", len(models_per_brand))
     print("Nb models:", len(models))
-    print("Nb Patterns:", len(ir_codes))
-    print("Nb unique patterns:", len(set(ir_codes)))
-    return ir_codes
+    print("Nb Patterns:", len(patterns))
+    print("Nb unique patterns:", len(set(patterns)))
+    return patterns
 
 
 def db_export(deviceid=None, format=None, list_devices=False, db_path=None, output=None):
@@ -84,10 +84,10 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
     export_filename = f"{format} Xiaomi_" + device_mapping[deviceid]
 
     # Load codes from directory
-    ir_patterns = load_device_codes(db_dir)
+    patterns = load_device_codes(db_dir)
 
     if format == "tvkill":
-        tvkill_export(ir_patterns, output, export_filename)
+        tvkill_export(patterns, output, export_filename)
     else:
         LOGGER.error("To be implemented")
         raise NotImplementedError
