@@ -160,7 +160,7 @@ moreover, some examples are available in unit tests.
 
 ## Online API description & flowchart
 
-```{mermaid}
+```mermaid
 
     flowchart TD
         A[Get devices] --> |/controller/device/1| B{Is Set-top box device?}
