@@ -24,19 +24,27 @@ def pronto_code():
     return "0000 006D 0022 0002 0158 00AA 0016 0015 0016 0016 0016 0016 0015 0015 0016 0016 0016 0016 0016 003E 0017 0015 0015 0040 0016 0040 0015 0040 0016 003F 0016 0040 0015 0040 0015 0015 0016 003F 0016 0016 0016 003F 0016 0015 0015 0016 0016 003E 0017 0016 0016 0015 0015 0016 0016 003E 0015 0018 0016 003E 0017 003F 0017 0015 0015 0040 0015 003F 0016 003F 0016 05FC 0157 0055 0016 0E5B"
 
 
-def test_to_pulses(ir_code):
-    pattern = Pattern(ir_code, 37990, code_type="raw")
-    print(pattern)
-    found = pattern.to_pulses()
-
-    expected = [
+@pytest.fixture()
+def pulse_code():
+    """Get IR pulses
+    Pulses (number of cycles of the carrier for which to turn the light ON and OFF)
+    """
+    return [
         344, 170, 22, 21, 22, 22, 22, 22, 21, 21, 22, 22, 22, 22, 22, 62, 23, 21,
         21, 64, 22, 64, 21, 64, 22, 63, 22, 64, 21, 64, 21, 21, 22, 63, 22, 22,
         22, 63, 22, 21, 21, 22, 22, 62, 23, 22, 22, 21, 21, 22, 22, 62, 21, 24,
         22, 62, 23, 63, 23, 21, 21, 64, 21, 63, 22, 63, 22, 1532, 343, 85, 22, 3675
     ]
+
+
+def test_to_pulses(ir_code, pulse_code):
+    """Convert raw pulses to pulses"""
+    pattern = Pattern(ir_code, 37990, code_type="raw")
+    print(pattern)
+    found = pattern.to_pulses()
+
     print(found)
-    assert expected == found
+    assert pulse_code == found
 
 
 def test_to_pronto(ir_code, pronto_code):
@@ -65,7 +73,24 @@ def test_from_pronto(ir_code, pronto_code):
     found = pattern.to_raw()
 
     print(found)
-    # Allow 5% relative difference (10% in the IR norme)
+    # Allow 5% relative difference (10% in the IR standard)
+    isclose = partial(math.isclose, abs_tol=0.0, rel_tol=0.05)
+    diff_result = list(map(isclose, ir_code, found))
+
+    # All values must be True (no significative diff)
+    print(diff_result, all(diff_result))
+    assert all(diff_result)
+
+
+def test_from_pulses(ir_code, pulse_code):
+    """Convert pulses to raw pulses"""
+    pattern = Pattern(pulse_code, 37990, code_type="pulses")
+    print(pattern)
+    found = pattern.to_raw()
+
+    print(found)
+
+    # Allow 5% relative difference (10% in the IR standard)
     isclose = partial(math.isclose, abs_tol=0.0, rel_tol=0.05)
     diff_result = list(map(isclose, ir_code, found))
 

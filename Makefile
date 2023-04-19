@@ -5,7 +5,7 @@ export_TV:
 	python -m src db_export -d 1 -f tvkill
 
 tests:
-	pytest tests/
+	pytest -v tests/
 
 coverage:
 	pytest --cov=src --cov-report term-missing -vv
