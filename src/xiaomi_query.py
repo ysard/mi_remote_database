@@ -23,7 +23,7 @@ from random import shuffle
 
 # Custom imports
 from .crypt_utils import build_url
-from .xiaomi_parser import load_devices, load_brand_list, load_brand_codes_from_dir
+from .xiaomi_parser import load_devices, load_brand_list, load_stp_brand_list, load_brand_codes_from_dir
 from .commons import logger
 
 LOGGER = logger()
@@ -42,12 +42,19 @@ def get_json_brands(device_id):
 
     `/controller/brand/list/1?version=6034&country=FR&ts=1234&nonce=1234&devid=1&opaque=XXX`
     """
-    return build_url(
-        "/controller/brand/list/1", [("devid", device_id)]
-    )
+    return build_url("/controller/brand/list/1", [("devid", device_id)])
 
 
-def get_json_brand(brand_id, device_id):
+def get_json_stb_brands():
+    """Get all brands of Set-top box devices
+
+    .. note:: Languages available: CN, IN, EN, TW.
+        IN is the only one with some brands returned.
+    """
+    return build_url("/controller/stb/lineup/match/1", [], country="IN")
+
+
+def get_json_brand(brand_id, device_id, stb=False):
     """Query the API for a brand and return the text result (JSON data)
 
     URL: `https://urc.io.mi.com/`
@@ -59,11 +66,19 @@ def get_json_brand(brand_id, device_id):
     :param brand_id: The id of the brand to be queried.
     :param device_id: The id of the device type in the DB;
         TV = 1, Projector = 10
+    :key stb: Switch to Set-top box devices if True.
     :type brand_id: <int>
     :type device_id: <int>
+    :type stb: <boolean>
     :return: JSON data
     :rtype: <str>
     """
+    if stb:
+        return build_url(
+            "/controller/match/tree/1",
+            [("devid", device_id), ("miyk", 1), ("spid", brand_id), ("power", 1)],
+        )
+
     return build_url(
         "/controller/match/tree/1",
         [("devid", device_id), ("miyk", 1), ("brandid", brand_id), ("power", 1)],
@@ -98,7 +113,7 @@ def get_json_model(matchid, vendorid="mi"):
 ################################################################################
 
 
-def crawl_brands(output_directory, brands):
+def crawl_brands(output_directory, brands, stb=False):
     """Query the API for all the given brands and dump the result to the given directory
 
     Brand files are located in `<database_dump>/<device>/*.json`.
@@ -111,8 +126,10 @@ def crawl_brands(output_directory, brands):
     :param output_directory: Directory where JSON data will be dumped
     :param brands: Dictionary of brand ids as keys, dict of names and device ids as values.
         .. seealso:: :meth:`load_brand_list`, `full_process_device`
+    :key stb: Switch to Set-top box devices if True.
     :type output_directory: <str> or <Path>
     :type brands: <dict <int>:<dict>>
+    :type stb: <boolean>
     """
     total = len(brands)
 
@@ -125,7 +142,7 @@ def crawl_brands(output_directory, brands):
 
         # Query the API for the given brand id
         LOGGER.info(f"Begin {index}/{total}: {brand_name} {brand_id}")
-        json_data = get_json_brand(brand_id, device_id)
+        json_data = get_json_brand(brand_id, device_id, stb=stb)
 
         # Dump the result
         filepath.write_text(json_data)
@@ -181,21 +198,24 @@ def guess_models(output_directory, ids_range):
     crawl_models(output_directory, model_ids)
 
 
-def full_process_device(output_directory, json_device_brands_path):
+def full_process_device(output_directory, json_device_brands_path, stb=False):
     """Crawl the API according to brands in the given json, and dump data
 
     :param output_directory: Device path `<database_dump>/<device>/`
     :param json_device_brands_path: File that lists brands to be queried in
         a specific device.
+    :key stb: Switch to Set-top box devices if True.
     :type output_directory: <Path>
     :type json_device_brands_path: <Path>
+    :type stb: <boolean>
     """
     # Load list of brands
-    brands = load_brand_list(json_device_brands_path)
+    func = load_stp_brand_list if stb else load_brand_list
+    brands = func(json_device_brands_path)
     # Query data for all brands if dir is empty
     output_directory.mkdir(exist_ok=True)
     # Download brands
-    crawl_brands(output_directory, brands)
+    crawl_brands(output_directory, brands, stb=stb)
 
 
 def dump_database(db_path="./database_dump", *args, **kwargs):
@@ -212,23 +232,28 @@ def dump_database(db_path="./database_dump", *args, **kwargs):
 
     # TODO: 2: {'name': 'Set-top box'} doesn't use the standard URL
     # Data ex: {1: {'name': 'TV'}, ...}
-    devices = {k: v for k, v in load_devices(json_devices_path).items() if k != 2}
+    devices = {k: v for k, v in load_devices(json_devices_path).items()}
 
     # Get brands
     for device_id, device in devices.items():
         device_name = device["name"]
         json_device_brands_path = Path(f"{db_path}/{device_id}_{device_name}.json")
+        stb_device = (device_id == 2)
 
         # Get available brands per deviceid
         if not json_device_brands_path.is_file():
-            Path(json_device_brands_path).write_text(get_json_brands(device_id))
+            if stb_device:
+                # Handle set-top box devices
+                content = get_json_stb_brands()
+            else:
+                content = get_json_brands(device_id)
+            Path(json_device_brands_path).write_text(content)
 
         device_brands_path = Path(f"{db_path}/{device_id}_{device_name}")
         device_brands_path.mkdir(exist_ok=True)
 
         # Get all brands definitions (with power IR code) per deviceid
-        # TODO: separate the function
-        full_process_device(device_brands_path, json_device_brands_path)
+        full_process_device(device_brands_path, json_device_brands_path, stb=stb_device)
 
     # Get models per device
     # models_path = Path(f"{db_path}/models/")
