@@ -101,12 +101,12 @@ Dump the database (If you don't want to use the one that is available in the Git
 
 Have coffee in the meantime... Files are in the directory `./database_dump` by default.
 
-If you just want to make an update, delete the *.json files in `./database_dump` but **keep files** in `models`
-directories.
+If you just want to make an update, delete the *.json files in `./database_dump`
+but **keep files** in `models` directories.
 
 List the known devices types in the dump:
 
-    $ python -m src db_export -l
+    $ python -m src db_stats -l
     Device Name: Device ID
     TV: 1
     Set-top box: 2
@@ -118,6 +118,14 @@ List the known devices types in the dump:
     Projector: 10
     Cable _ Satellite box: 11
     Camera: 13
+
+List the known brands for a specific device:
+
+    $ python -m src db_stats -lb -d 2
+    Brands for 'Set-top box' device:
+    dict_keys(['Home Digital_in137', 'ACT Digital_in112', 'Airtel_in100', ...])
+    # See the 2 parts for each name: `brandname_internalid`.
+    # 1 of them or both can be used later.
 
 With **this ids mapping you will be able to export codes for a specific device**,
 like shown in the next section.
