@@ -224,11 +224,11 @@ def full_process_device(output_directory, json_device_brands_path, stb=False):
 def dump_database(*_args, db_path="./database_dump", **_kwargs):
     """Dump all the database into the given directory
 
-    - get all devices: mapping deviceid/device type
+    - get all devices: mapping deviceid/device type;
         Example of files created: 1_TV.json, 2_Set-top box.json, etc.
-    - get all brands per deviceid
+    - get all brands per deviceid;
         Example of files created: Fujitsu_70.json, Sony_141.json, etc.
-    - get models per brand for each deviceid
+    - get models per brand for each deviceid.
     """
     # Get all devices
     json_devices_path = Path(f"{db_path}/devices.json")
