@@ -290,3 +290,7 @@ For exemple, for TV codes:
 
 Feedback in issues is important and pull-requests are welcome,
 but time could be missing to implement large functionality requests ;)
+
+## Thanks
+
+@LionZXY (Help with Flipper Zero support #3).
