@@ -535,7 +535,7 @@ def build_all_patterns(brands_data, models_path):
                 patterns[pattern_key] = pattern
                 models_patterns[model_id].append(pattern)
 
-    LOGGER.info("Nb brands: %d", len(models_patterns))
+    LOGGER.info("Nb brands: %d", len(brands_data))
     LOGGER.info("Nb models: %d", total_models)
     LOGGER.info("Unique patterns: %d", len(patterns))
     return dict(models_patterns)
