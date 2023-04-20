@@ -93,53 +93,54 @@ Get some help:
 
     $ python -m src --help
 
-Dump the database (If you don't want to use the one that is available in the GitHub assets, or if you want to update it).
+- Dump the database (If you don't want to use the one that is available in the
+GitHub assets, or if you want to update it).
 
-    $ python -m src db_dump
-    # or just:
-    $ make db_dump
+        $ python -m src db_dump
+        # or just:
+        $ make db_dump
 
-Have coffee in the meantime... Files are in the directory `./database_dump` by default.
+    Have coffee in the meantime... Files are in the directory `./database_dump` by default.
 
-If you just want to make an update, delete the *.json files in `./database_dump`
-but **keep files** in `models` directories.
+    If you just want to make an update, delete the *.json files in `./database_dump`
+    but **keep files** in `models` directories.
 
-List the known devices types in the dump:
+- List the known devices types in the dump:
 
-    $ python -m src db_stats -l
-    Device Name: Device ID
-    TV: 1
-    Set-top box: 2
-    AC: 3
-    Fan: 6
-    Box: 12
-    A_V receiver: 8
-    DVD: 4
-    Projector: 10
-    Cable _ Satellite box: 11
-    Camera: 13
+        $ python -m src db_stats -l
+        Device Name: Device ID
+        TV: 1
+        Set-top box: 2
+        AC: 3
+        Fan: 6
+        Box: 12
+        A_V receiver: 8
+        DVD: 4
+        Projector: 10
+        Cable _ Satellite box: 11
+        Camera: 13
 
-List the known brands for a specific device:
+- List the known brands for a specific device:
 
-    $ python -m src db_stats -lb -d 2
-    Brands for 'Set-top box' device:
-    dict_keys(['Home Digital_in137', 'ACT Digital_in112', 'Airtel_in100', ...])
-    # See the 2 parts for each name: `brandname_internalid`.
-    # 1 of them or both can be used later.
+        $ python -m src db_stats -lb -d 2
+        Brands for 'Set-top box' device:
+        dict_keys(['Home Digital_in137', 'ACT Digital_in112', 'Airtel_in100', ...])
+        # See the 2 parts for each name: `brandname_internalid`.
+        # 1 of them or both can be used later.
 
-With **this ids mapping you will be able to export codes for a specific device**,
-like shown in the next section.
-Other formats can be easily implemented by someone who needs it.
+    With **these ids & names you will be able to export codes for a
+    specific devic or brande**, like shown in the next section.
+    Other formats can be easily implemented by someone who needs it.
 
-Filtering brand names is possible by using `--brands` argument:
+- Filtering brand names is possible by using `--brands` argument:
 
-    $ python -m src db_export -d 1 --brands Fujitsu,Sony -f flipper
-    ...
-    Nb brands: 2
-    Nb models: 10
-    Unique patterns: 382
+        $ python -m src db_export -d 1 --brands Fujitsu,Sony -f flipper
+        ...
+        Nb brands: 2
+        Nb models: 10
+        Unique patterns: 382
 
-Note: Currently, its only for the `flipper` export.
+    Note: Currently, its only for the `flipper` export.
 
 
 ## TV Kill Android app
