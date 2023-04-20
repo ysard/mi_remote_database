@@ -616,7 +616,7 @@ def load_ids_from_brands(device_path, brands=tuple(), vendors=tuple()):
 
         # Skip if filter is enabled and name not compatible with the current file
         if brands:
-            found_name = [True for name in brands if name in brand_filepath]
+            found_name = [True for name in brands if name in str(brand_filepath)]
             if not found_name:
                 continue
 
