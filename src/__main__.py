@@ -21,7 +21,12 @@ from pathlib import Path
 import argparse
 
 # Custom imports
-from src.xiaomi_parser import load_brand_codes_from_dir, build_patterns, load_ids_from_brands, build_all_patterns
+from src.xiaomi_parser import (
+    load_brand_codes_from_dir,
+    build_patterns,
+    load_ids_from_brands,
+    build_all_patterns,
+)
 from src.xiaomi_query import dump_database, load_devices
 from src.writers import *
 import src.commons as cm
@@ -81,8 +86,7 @@ def db_export(deviceid=None, format=None, db_path=None, output=None, **kwargs):
     """Export data to various formats"""
     # Load devices ids/names mapping
     device_mapping = {
-        k: v["name"] for k, v in
-        load_devices(Path(f"{db_path}/devices.json")).items()
+        k: v["name"] for k, v in load_devices(Path(f"{db_path}/devices.json")).items()
     }
 
     # Expect directory <db_dir>/<int>_<device_name>/
@@ -97,9 +101,7 @@ def db_export(deviceid=None, format=None, db_path=None, output=None, **kwargs):
         queried_brands = kwargs.get("brands")
         if queried_brands:
             queried_brands = {
-                name
-                for name in queried_brands.rstrip().split(",")
-                if name
+                name for name in queried_brands.rstrip().split(",") if name
             }
         else:
             queried_brands = tuple()
@@ -121,8 +123,7 @@ def db_stats(deviceid=None, db_path=None, **kwargs):
     """Show stats about what the databse contains"""
     # Load devices ids/names mapping
     device_mapping = {
-        k: v["name"] for k, v in
-        load_devices(Path(f"{db_path}/devices.json")).items()
+        k: v["name"] for k, v in load_devices(Path(f"{db_path}/devices.json")).items()
     }
 
     # Display available devices if asked
@@ -187,13 +188,17 @@ def main():
     )
     parser_stats.set_defaults(func=db_stats)
     parser_stats.add_argument(
-        "-ld", "--list_devices", help="List available devices in DB",
-        action="store_true"
+        "-ld",
+        "--list_devices",
+        help="List available devices in DB",
+        action="store_true",
     )
     parser_stats_grp = parser_stats.add_argument_group()
     parser_stats_grp.add_argument(
-        "-lb", "--list_brands", help="List available brands for the given device id",
-        action="store_true"
+        "-lb",
+        "--list_brands",
+        help="List available brands for the given device id",
+        action="store_true",
     )
     parser_stats_grp.add_argument(
         "-d",
@@ -219,9 +224,11 @@ def main():
         default=1,
     )
     parser_export.add_argument(
-        "-b", "--brands", help="Filter on brand names/ids. Items must be coma "
+        "-b",
+        "--brands",
+        help="Filter on brand names/ids. Items must be coma "
         "separated. Ex: <Fujitsu,Sony>.",
-        default=None
+        default=None,
     )
     parser_export.add_argument(
         "-f", "--format", help="Export format (tvkill for now)", default="tvkill"
