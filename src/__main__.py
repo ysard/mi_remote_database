@@ -93,10 +93,21 @@ def db_export(deviceid=None, format=None, db_path=None, output=None, **kwargs):
         patterns = load_device_codes(device_path)
         tvkill_export(patterns, output, device_mapping[deviceid])
     elif format == "flipper":
+        # Prepare filtering on brands
+        queried_brands = kwargs.get("brands")
+        if queried_brands:
+            queried_brands = {
+                name
+                for name in queried_brands.rstrip().split(",")
+                if name
+            }
+        else:
+            queried_brands = tuple()
+
         # Here we need ALL IR codes, IR codes stored in JSON brand files
         # are NOT enough, we MUST use model files.
         # Load brands data for the given device
-        brands_data = load_ids_from_brands(device_path)
+        brands_data = load_ids_from_brands(device_path, brands=queried_brands)
 
         # Get Patterns for all retrieved models
         models_patterns = build_all_patterns(brands_data, device_path / "models")
@@ -206,6 +217,11 @@ def main():
         help="Device id (1: TV, 10: Projectors, etc.). See devices.json",
         type=int,
         default=1,
+    )
+    parser_export.add_argument(
+        "-b", "--brands", help="Filter on brand names/ids. Items must be coma "
+        "separated. Ex: <Fujitsu,Sony>.",
+        default=None
     )
     parser_export.add_argument(
         "-f", "--format", help="Export format (tvkill for now)", default="tvkill"
