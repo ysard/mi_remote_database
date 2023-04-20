@@ -131,6 +131,17 @@ With **this ids mapping you will be able to export codes for a specific device**
 like shown in the next section.
 Other formats can be easily implemented by someone who needs it.
 
+Filtering brand names is possible by using `--brands` argument:
+
+    $ python -m src db_export -d 1 --brands Fujitsu,Sony -f flipper
+    ...
+    Nb brands: 2
+    Nb models: 10
+    Unique patterns: 382
+
+Note: Currently, its only for the `flipper` export.
+
+
 ## TV Kill Android app
 
 Export IR codes for one device type to the format of [TVKILL](https://github.com/42SK/TVKILL/) Android app.
