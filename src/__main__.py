@@ -55,21 +55,16 @@ def load_device_codes(device_directory):
     return patterns
 
 
-def db_export(deviceid=None, format=None, list_devices=False, db_path=None, output=None):
-    """Export data to (various ?) formats"""
-    # Load devices ids/names mapping
-    device_mapping = {
-        k: v["name"] for k, v in
-        load_devices(Path(f"{db_path}/devices.json")).items()
-    }
+def check_device_path(db_path, deviceid):
+    """Check if a database path exists for the given device id
 
-    # Display available devices if asked
-    if list_devices:
-        print("Device ID: Device Name")
-        for dev_name, dev_id in device_mapping.items():
-            print(f"{dev_name}: {dev_id}")
-        raise SystemExit(0)
-
+    :param db_path: Database root directory
+    :param deviceid: Id of the device queried
+    :type db_path: <Path>
+    :type deviceid: <int>
+    :return: Device directory path
+    :rtype: <Path>
+    """
     # Expect directory <db_dir>/<int>_<device_name>/
     found_dirs = [p for p in Path(db_path).glob(f"{deviceid}_*") if p.is_dir()]
     device_path = found_dirs[0] if len(found_dirs) == 1 else None
@@ -79,6 +74,19 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
             "Missing device files or wrong directory: %s/%s_*/", db_path, deviceid
         )
         raise SystemExit(1)
+    return device_path
+
+
+def db_export(deviceid=None, format=None, db_path=None, output=None, **kwargs):
+    """Export data to various formats"""
+    # Load devices ids/names mapping
+    device_mapping = {
+        k: v["name"] for k, v in
+        load_devices(Path(f"{db_path}/devices.json")).items()
+    }
+
+    # Expect directory <db_dir>/<int>_<device_name>/
+    device_path = check_device_path(db_path, deviceid)
 
     if format == "tvkill":
         # Load codes from brands
@@ -96,6 +104,28 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
     else:
         LOGGER.error("To be implemented")
         raise NotImplementedError
+
+
+def db_stats(deviceid=None, db_path=None, **kwargs):
+    """Show stats about what the databse contains"""
+    # Load devices ids/names mapping
+    device_mapping = {
+        k: v["name"] for k, v in
+        load_devices(Path(f"{db_path}/devices.json")).items()
+    }
+
+    # Display available devices if asked
+    if kwargs.get("list_devices"):
+        print("Device ID: Device Name")
+        for dev_name, dev_id in device_mapping.items():
+            print(f"{dev_name}: {dev_id}")
+
+    if kwargs.get("list_brands"):
+        # Expect directory <db_dir>/<int>_<device_name>/
+        device_path = check_device_path(db_path, deviceid)
+        brands_data = load_ids_from_brands(device_path)
+        print(f"Brands for '{device_mapping[deviceid]}' device:")
+        print(brands_data.keys())
 
 
 def args_to_param(args):
@@ -137,6 +167,31 @@ def main():
     )
     parser_db_dump.set_defaults(func=dump_database)
 
+    # Stats
+    parser_stats = subparsers.add_parser(
+        "db_stats",
+        parents=[parent_parser],
+        help=db_stats.__doc__,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser_stats.set_defaults(func=db_stats)
+    parser_stats.add_argument(
+        "-ld", "--list_devices", help="List available devices in DB",
+        action="store_true"
+    )
+    parser_stats_grp = parser_stats.add_argument_group()
+    parser_stats_grp.add_argument(
+        "-lb", "--list_brands", help="List available brands for the given device id",
+        action="store_true"
+    )
+    parser_stats_grp.add_argument(
+        "-d",
+        "--deviceid",
+        help="Device id (1: TV, 10: Projectors, etc.). See devices.json",
+        type=int,
+        default=1,
+    )
+
     # Export
     parser_export = subparsers.add_parser(
         "db_export",
@@ -154,10 +209,6 @@ def main():
     )
     parser_export.add_argument(
         "-f", "--format", help="Export format (tvkill for now)", default="tvkill"
-    )
-    parser_export.add_argument(
-        "-l", "--list_devices", help="List available devices in DB",
-        action="store_true"
     )
     parser_export.add_argument(
         "-o",
