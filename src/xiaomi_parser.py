@@ -23,6 +23,8 @@ TODO: put the deviceid/vendorid in the Pattern object
 # Standard imports
 import json
 from pathlib import Path
+import itertools as it
+from collections import defaultdict
 
 # Custom imports
 from .crypt_utils import build_url, process_xiaomi_shit
@@ -447,6 +449,105 @@ def build_patterns(models):
             patterns.append(pattern)
 
     return patterns
+
+
+def get_vendors_model_ids(brand_filepath):
+    """Get model ids per vendor, for the given brand file
+
+    Example of returned data:
+
+        {
+            'kk': {'kk_*'},
+            'mi': {'xm_*'},
+            ...
+        }
+
+    :param brand_filepath: Filepath of a brand JSON file.
+    :type brand_filepath: <Path>
+    :return: Dictionary of vendors as keys and model ids as values.
+        Expected optional keys: ("mi", "kk", "mx", "xm", "yk").
+        'mi' vendor should be set most of the time but not guaranteed.
+    :rtype: <dict <str>: <set>>
+    """
+    json_filedata = json.loads(Path(brand_filepath).read_text())
+
+    data = json_filedata["data"]
+    model_ids = defaultdict(set)
+
+    # Extra data from other vendors
+    if "others" in data:
+        for model in data["others"]:
+            model_ids[model["source"]].add(model["_id"])
+
+    # Usual data from "mi" vendor
+    tree = data["tree"]
+    if not tree:
+        return dict(model_ids)
+
+    # Skip the first element of nodes: "children_index"
+    model_ids["mi"].update(
+        it.chain(*[model["keysetids"] for model in tree["nodes"][1:]])
+    )
+    return dict(model_ids)
+
+
+def load_ids_from_brands(device_path, brands=tuple(), vendors=tuple()):
+    """Get model ids per vendor per brand, for the given device path
+
+    Example of returned data:
+        {
+            'Fujitsu_70': {
+                'kk': {'kk_*'},
+                'mi': {'xm_*'},
+                ...
+            },
+            ...
+        }
+
+    :param device_path: Directory path storing all JSON files for brands of
+        a type of device.
+    :key: brands: Iterable of brand names to retrieve. Non-matching names will
+        be dropped. Default: No filtering.
+    :key: vendors: Iterable of vendors to retrive. Non-matching names will
+        be dropped. Default: No filtering.
+    :type brands: <tuple>
+    :type vendors: <tuple>
+    :type device_path: <Path>
+    :return: Dictionary of brands as keys and dict of vendors as values.
+        Each vendor has model ids as values.
+        Expected optional vendor keys: ("mi", "kk", "mx", "xm", "yk").
+        'mi' vendor should be set most of the time but not guaranteed.
+    :rtype: <dict <dict <str>: <set>>>
+    """
+    total = 0
+    brands_data = dict()
+    for brand_filepath in device_path.glob("*.json"):
+
+        # Skip if filter is enabled and name not compatible with the current file
+        if brands:
+            found_name = [True for name in brands if name in brand_filepath]
+            if not found_name:
+                continue
+
+        # Load model ids per vendor, from models in this brand file
+        vendors_data = get_vendors_model_ids(brand_filepath)
+        if vendors:
+            # Filter on vendor names
+            vendors_data = {
+                vendor: data
+                for vendor, data in vendors_data.items()
+                if vendor in vendors
+            }
+
+        brand_name = brand_filepath.stem  # TODO: str(brand_filepath.stem).split("_")[0]
+        brands_data[brand_name] = vendors_data
+
+        nb_model_ids = sum(len(ids) for ids in vendors_data.values())
+        LOGGER.info("%s... %d", brand_filepath, nb_model_ids)
+        total += nb_model_ids
+
+    LOGGER.info("TOTAL models from brands loaded: %d", total)
+    return brands_data
 
 
 def load_brand_codes_from_dir(directory):
