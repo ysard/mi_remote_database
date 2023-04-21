@@ -1,3 +1,7 @@
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ysard/mi_remote_database)](https://github.com/ysard/mi_remote_database/releases/latest/)
+[![python docstring coverage](./assets/interrogate_badge.svg)](https://interrogate.readthedocs.io/en/latest/)
+[![python test coverage](./assets/coverage.svg)](https://docs.pytest.org/en/latest/)
+
 You will find on this repository a proof of concept aiming to reproduce and query the infrared
 code database used by the Xiaomi *Mi Remote* application.
 
