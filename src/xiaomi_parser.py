@@ -72,6 +72,8 @@ def load_devices(filename):
 def load_brand_list(filename):
     """Get brands from JSON dump
 
+    Device file data example:
+
     {
        "status":0,
        "data":[
@@ -198,7 +200,7 @@ def load_stp_brand_list(filename):
     Here, the `sp` key is assimilated to the `brandid` usually adopted
     everywhere else in the API.
 
-    Data example:
+    Device file data example:
 
     {"status":0,"data":{
         "count":52,"data":[
@@ -351,8 +353,9 @@ def load_brand_codes(filename):
             shutter_code = json_model["key"].get("shutter")
             if not power_code and not shutter_code:
                 LOGGER.warning(
-                    "Key power/shutter NOT FOUND in 'others', id <%s>: %s",
-                    json_model["_id"], json_model["key"].keys(),
+                    "Key power/shutter NOT FOUND in 'others', path: <%s>; "
+                    "model id <%s>; keys: %s",
+                    filename, json_model["_id"], json_model["key"].keys(),
                 )
                 continue
 
@@ -375,7 +378,6 @@ def load_brand_codes(filename):
     models = list()
 
     if "others" in json_filedata["data"]:
-        # "others" section is not considered for now
         models += [
             model for model in parse_others_section(json_filedata["data"]["others"])
         ]
@@ -581,6 +583,7 @@ def load_ids_from_brands(device_path, brands=tuple(), vendors=tuple()):
     """Get model ids per vendor per brand, for the given device path
 
     Example of returned data:
+
         {
             'Fujitsu_70': {
                 'kk': {'kk_*'},
