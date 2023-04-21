@@ -16,3 +16,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Expose of high-level writer classes"""
 from .tvkill import tvkill_export
+from .flipper_zero import flipper_zero_export
