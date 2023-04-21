@@ -11,7 +11,7 @@ coverage:
 	pytest --cov=src --cov-report term-missing -vv
 
 docstring_coverage:
-	interrogate -v src/ -e src/__init__.py --ignore-magic --badge-style flat --generate-badge .
+	interrogate -v src/ -e src/__init__.py --ignore-magic --badge-style flat --generate-badge ./assets/
 
 compress_db:
 	XZ_OPT=-9 tar Jcvf database_dump.tar.xz ./database_dump/
