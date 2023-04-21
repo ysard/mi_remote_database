@@ -80,13 +80,10 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
         )
         raise SystemExit(1)
 
-    # Build export filename based on device name
-    export_filename = f"{format} Xiaomi_" + device_mapping[deviceid]
-
     if format == "tvkill":
-        # Load codes from directory
+        # Load codes from brands
         patterns = load_device_codes(device_path)
-        tvkill_export(patterns, output, export_filename)
+        tvkill_export(patterns, output, device_mapping[deviceid])
     elif format == "flipper":
         # Here we need ALL IR codes, IR codes stored in JSON brand files
         # are NOT enough, we MUST use model files.

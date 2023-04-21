@@ -33,10 +33,13 @@ def tvkill_export(patterns, output, export_filename):
         for code in set(patterns)
     ]
     tvkill_patterns = {
-        "designation": export_filename,
+        "designation": "Xiaomi "
+        + device_name
+        + "from Mi Remote DB <https://github.com/ysard/mi_remote_database>",
         "patterns": code_list,
     }
     json_data = json.dumps([tvkill_patterns])  # , indent=2)
-    Path(output, export_filename.replace(" ", "_") + ".json").write_text(
-        json_data
-    )
+
+    # Build export filename based on device name
+    export_filename = "TVKill_Xiaomi_" + device_name
+    Path(output, export_filename.replace(" ", "_") + ".json").write_text(json_data)
