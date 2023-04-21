@@ -27,7 +27,7 @@ from .xiaomi_parser import (
     load_devices,
     load_brand_list,
     load_stp_brand_list,
-    load_brand_codes_from_dir,
+    load_ids_from_brands,
 )
 from .commons import logger
 
@@ -256,36 +256,22 @@ def dump_database(*_args, db_path="./database_dump", **_kwargs):
         device_brands_path = Path(f"{db_path}/{device_id}_{device_name}")
         device_brands_path.mkdir(exist_ok=True)
 
-        # Get all brands definitions (with power IR code) per deviceid
+        # Download all brands definitions (with power IR code) per deviceid
         full_process_device(device_brands_path, json_device_brands_path, stb=stb_device)
 
     # Get models per device
-    # models_path = Path(f"{db_path}/models/")
-    # models_path.mkdir(exist_ok=True)
     for device_id, device in devices.items():
         device_name = device["name"]
         device_brands_path = Path(f"{db_path}/{device_id}_{device_name}")
         models_path = device_brands_path / "models/"
         models_path.mkdir(exist_ok=True)
 
-        models = list(it.chain(*load_brand_codes_from_dir(device_brands_path).values()))
+        # Get model ids per vendor per brand
+        brands_data = load_ids_from_brands(device_brands_path)
+        model_ids = set(it.chain(*[model_ids for brand, vendors in brands_data.items() for model_ids in vendors.values()]))
 
-        # Only xiaomi models
-        mi_models = set(
-            it.chain(*[model["keysetids"] for model in models if "keysetids" in model])
-        )
-        crawl_models(models_path, mi_models)
-
-        # Create sets of model ids for each "others" vendor
-        other_models = ("kk", "mx", "xm", "yk")
-        model_id_sets = [
-            {model["_id"] for model in models if model.get("source") == vendor}
-            for vendor in other_models
-        ]
-
-        for vendor, model_ids in zip(other_models, model_id_sets):
-            LOGGER.info(model_ids)
-            crawl_models(models_path, model_ids, vendorid=vendor)
+        # Download models
+        crawl_models(models_path, model_ids)
 
 
 if __name__ == "__main__":
