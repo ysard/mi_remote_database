@@ -94,6 +94,7 @@ class Pattern:
         """
 
         def to_padded_hex(number):
+            """Get 4 digits hex padded representation of the given number"""
             return "{0:0{1}X}".format(number, 4)
 
         # Convert frequency in Hz to pronto internal clock
