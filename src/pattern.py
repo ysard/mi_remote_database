@@ -75,7 +75,7 @@ class Pattern:
         }
 
         if code_type in ("raw", "pulses"):
-            assert frequency
+            assert frequency, "Missing frequency argument for the given code_type!"
 
         self.brand = brand_name
         self.name = name
