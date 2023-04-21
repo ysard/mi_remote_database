@@ -214,10 +214,9 @@ def full_process_device(output_directory, json_device_brands_path, stb=False):
     :type json_device_brands_path: <Path>
     :type stb: <boolean>
     """
-    # Load list of brands
+    # Load list of brands that should be queried
     func = load_stp_brand_list if stb else load_brand_list
     brands = func(json_device_brands_path)
-    # Query data for all brands if dir is empty
     output_directory.mkdir(exist_ok=True)
     # Download brands
     crawl_brands(output_directory, brands, stb=stb)
