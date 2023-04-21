@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # mi_remote_database a database retriever for IR codes
-# Copyright (C) 2021  Ysard
+# Copyright (C) 2021-2023  Ysard
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
