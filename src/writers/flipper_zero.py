@@ -80,7 +80,4 @@ Version: 1
 
         # Dump
         path = Path(output) / f"{brand}_{model_id}.ir"
-        # path.unlink(missing_ok=True)  # For py 3.8+
-        if path.exists():
-            path.unlink()
         path.write_text(content)

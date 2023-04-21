@@ -22,9 +22,6 @@ def test_flipper(tmp_path, ir_code):
         'mi_1': [pattern_1, pattern_2],
     }
 
-    # Create file to test unlink function if file exists
-    (tmp_path / "Fake_Brand_kk_1.ir").write_text("hello")
-
     flipper_zero_export(fake_data, tmp_path, "Fake Device")
 
     # Test replacement of whitespace chars by "_"
