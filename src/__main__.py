@@ -17,13 +17,13 @@
 """Entry point and argument parser"""
 # Standard imports
 import itertools as it
-import json
 from pathlib import Path
 import argparse
 
 # Custom imports
-from src.xiaomi_parser import load_brand_codes_from_dir, build_patterns
+from src.xiaomi_parser import load_brand_codes_from_dir, build_patterns, load_ids_from_brands, build_all_patterns
 from src.xiaomi_query import dump_database, load_devices
+from src.writers import *
 import src.commons as cm
 
 LOGGER = cm.logger()
@@ -46,13 +46,13 @@ def load_device_codes(device_directory):
     models_per_brand = load_brand_codes_from_dir(device_directory)
     models = list(it.chain(*models_per_brand.values()))
     # Get Patterns from clear IR codes
-    ir_codes = build_patterns(models)
+    patterns = build_patterns(models)
 
     print("Nb brands:", len(models_per_brand))
     print("Nb models:", len(models))
-    print("Nb Patterns:", len(ir_codes))
-    print("Nb unique patterns:", len(set(ir_codes)))
-    return ir_codes
+    print("Nb Patterns:", len(patterns))
+    print("Nb unique patterns:", len(set(patterns)))
+    return patterns
 
 
 def db_export(deviceid=None, format=None, list_devices=False, db_path=None, output=None):
@@ -65,55 +65,37 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
 
     # Display available devices if asked
     if list_devices:
-        print("Device Name: Device ID")
+        print("Device ID: Device Name")
         for dev_name, dev_id in device_mapping.items():
             print(f"{dev_name}: {dev_id}")
         raise SystemExit(0)
 
     # Expect directory <db_dir>/<int>_<device_name>/
     found_dirs = [p for p in Path(db_path).glob(f"{deviceid}_*") if p.is_dir()]
-    db_dir = found_dirs[0] if len(found_dirs) == 1 else None
+    device_path = found_dirs[0] if len(found_dirs) == 1 else None
 
-    if not db_dir:
+    if not device_path:
         LOGGER.error(
             "Missing device files or wrong directory: %s/%s_*/", db_path, deviceid
         )
         raise SystemExit(1)
 
-    # Build export filename based on device name
-    export_filename = f"{format} Xiaomi_" + device_mapping[deviceid]
-
-    # Load codes from directory
-    ir_patterns = load_device_codes(db_dir)
-
     if format == "tvkill":
-        tvkill_export(ir_patterns, output, export_filename)
+        # Load codes from brands
+        patterns = load_device_codes(device_path)
+        tvkill_export(patterns, output, device_mapping[deviceid])
+    elif format == "flipper":
+        # Here we need ALL IR codes, IR codes stored in JSON brand files
+        # are NOT enough, we MUST use model files.
+        # Load brands data for the given device
+        brands_data = load_ids_from_brands(device_path)
+
+        # Get Patterns for all retrieved models
+        models_patterns = build_all_patterns(brands_data, device_path / "models")
+        flipper_zero_export(models_patterns, output, device_mapping[deviceid])
     else:
         LOGGER.error("To be implemented")
         raise NotImplementedError
-
-
-def tvkill_export(patterns, output, export_filename):
-    """Export Pattern objects to JSON data for TV Kill app
-
-    .. note:: Unique patterns are used to reduce overhead.
-    """
-    code_list = [
-        {
-            "comment": "{} {}".format(code.vendor_id, code.model_id),
-            "frequency": code.frequency,
-            "pattern": code.to_pulses(),
-        }
-        for code in set(patterns)
-    ]
-    tvkill_patterns = {
-        "designation": export_filename,
-        "patterns": code_list,
-    }
-    json_data = json.dumps([tvkill_patterns])  # , indent=2)
-    Path(output, export_filename.replace(" ", "_") + ".json").write_text(
-        json_data
-    )
 
 
 def args_to_param(args):

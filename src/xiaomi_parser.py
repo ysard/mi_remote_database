@@ -23,6 +23,8 @@ TODO: put the deviceid/vendorid in the Pattern object
 # Standard imports
 import json
 from pathlib import Path
+import itertools as it
+from collections import defaultdict
 
 # Custom imports
 from .crypt_utils import build_url, process_xiaomi_shit
@@ -69,6 +71,8 @@ def load_devices(filename):
 
 def load_brand_list(filename):
     """Get brands from JSON dump
+
+    Device file data example:
 
     {
        "status":0,
@@ -196,7 +200,7 @@ def load_stp_brand_list(filename):
     Here, the `sp` key is assimilated to the `brandid` usually adopted
     everywhere else in the API.
 
-    Data example:
+    Device file data example:
 
     {"status":0,"data":{
         "count":52,"data":[
@@ -349,8 +353,9 @@ def load_brand_codes(filename):
             shutter_code = json_model["key"].get("shutter")
             if not power_code and not shutter_code:
                 LOGGER.warning(
-                    "Key power/shutter NOT FOUND in 'others', id <%s>: %s",
-                    json_model["_id"], json_model["key"].keys(),
+                    "Key power/shutter NOT FOUND in 'others', path: <%s>; "
+                    "model id <%s>; keys: %s",
+                    filename, json_model["_id"], json_model["key"].keys(),
                 )
                 continue
 
@@ -373,7 +378,6 @@ def load_brand_codes(filename):
     models = list()
 
     if "others" in json_filedata["data"]:
-        # "others" section is not considered for now
         models += [
             model for model in parse_others_section(json_filedata["data"]["others"])
         ]
@@ -447,6 +451,192 @@ def build_patterns(models):
             patterns.append(pattern)
 
     return patterns
+
+
+def build_all_patterns(brands_data, models_path):
+    """Generate 1 Pattern object (clear IR codes) for each IR code found in the
+    model files corresponding to the given model ids.
+
+    IR codes are decrypted according to :meth:`process_xiaomi_shit`.
+
+    Example of input data:
+
+        {
+            'Fujitsu_70': {
+                'kk': {'kk_*'},
+                'mi': {'xm_*'},
+                ...
+            },
+            ...
+        }
+
+    Example of returned data:
+
+        {
+            'kk_*': [Pattern, ...],
+            'mi_*': [Pattern, ...],
+        }
+
+    :param brands_data: Model ids per vendor per brand.
+        See :meth:`load_ids_from_brands`.
+    :param models_path: Directory path storing all JSON files for models of
+        a type of device.
+    :type brands_data: <dict <dict <str>: <set>>>
+    :type models_path: <Path>
+    :return: Dictionary of model ids as keys and list of Pattern objects as values.
+    :rtype: <dict <str>: <list <Pattern>>>
+    """
+    models = (
+        (brand, vendor_id, model_ids)
+        for brand, vendors in brands_data.items()
+        for vendor_id, model_ids in vendors.items()
+    )
+    # Index to speed up process in case of duplicates
+    patterns = dict()
+    # Final result: model_id as keys, patterns as values
+    models_patterns = defaultdict(list)
+    total_models = 0
+    for brand, vendor_id, model_ids in models:
+        total_models += len(model_ids)
+
+        for model_id in model_ids:
+            filepath = models_path / (model_id + ".json")
+            json_filedata = json.loads(filepath.read_text())
+
+            data = json_filedata["data"]
+            if not data:
+                continue
+            frequency = data["frequency"]
+            if not frequency:
+                LOGGER.error("Bad frequency: %s: %d", filepath, frequency)
+                continue
+
+            # Create 1 pattern object for each key
+            for key_name, ir_cipher in data["key"].items():
+                # Is pattern already built ?
+                pattern_key = (ir_cipher, frequency)
+                pattern = patterns.get(pattern_key)
+                if pattern:
+                    models_patterns[model_id].append(pattern)
+                    continue
+
+                # Decrypt IR code
+                ir_code = process_xiaomi_shit(ir_cipher)
+                pattern = Pattern(
+                    ir_code,
+                    frequency,
+                    name=key_name,
+                    model_id=model_id,
+                    brand_name=brand,
+                    vendor_id=vendor_id,
+                )
+                patterns[pattern_key] = pattern
+                models_patterns[model_id].append(pattern)
+
+    LOGGER.info("Nb brands: %d", len(models_patterns))
+    LOGGER.info("Nb models: %d", total_models)
+    LOGGER.info("Unique patterns: %d", len(patterns))
+    return dict(models_patterns)
+
+
+def get_vendors_model_ids(brand_filepath):
+    """Get model ids per vendor, for the given brand file
+
+    Example of returned data:
+
+        {
+            'kk': {'kk_*'},
+            'mi': {'xm_*'},
+            ...
+        }
+
+    :param brand_filepath: Filepath of a brand JSON file.
+    :type brand_filepath: <Path>
+    :return: Dictionary of vendors as keys and model ids as values.
+        Expected optional keys: ("mi", "kk", "mx", "xm", "yk").
+        'mi' vendor should be set most of the time but not guaranteed.
+    :rtype: <dict <str>: <set>>
+    """
+    json_filedata = json.loads(Path(brand_filepath).read_text())
+
+    data = json_filedata["data"]
+    model_ids = defaultdict(set)
+
+    # Extra data from other vendors
+    if "others" in data:
+        for model in data["others"]:
+            model_ids[model["source"]].add(model["_id"])
+
+    # Usual data from "mi" vendor
+    tree = data["tree"]
+    if not tree:
+        return dict(model_ids)
+
+    # Skip the first element of nodes: "children_index"
+    model_ids["mi"].update(
+        it.chain(*[model["keysetids"] for model in tree["nodes"][1:]])
+    )
+    return dict(model_ids)
+
+
+def load_ids_from_brands(device_path, brands=tuple(), vendors=tuple()):
+    """Get model ids per vendor per brand, for the given device path
+
+    Example of returned data:
+
+        {
+            'Fujitsu_70': {
+                'kk': {'kk_*'},
+                'mi': {'xm_*'},
+                ...
+            },
+            ...
+        }
+
+    :param device_path: Directory path storing all JSON files for brands of
+        a type of device.
+    :key: brands: Iterable of brand names to retrieve. Non-matching names will
+        be dropped. Default: No filtering.
+    :key: vendors: Iterable of vendors to retrive. Non-matching names will
+        be dropped. Default: No filtering.
+    :type brands: <tuple>
+    :type vendors: <tuple>
+    :type device_path: <Path>
+    :return: Dictionary of brands as keys and dict of vendors as values.
+        Each vendor has model ids as values.
+        Expected optional vendor keys: ("mi", "kk", "mx", "xm", "yk").
+        'mi' vendor should be set most of the time but not guaranteed.
+    :rtype: <dict <dict <str>: <set>>>
+    """
+    total = 0
+    brands_data = dict()
+    for brand_filepath in device_path.glob("*.json"):
+
+        # Skip if filter is enabled and name not compatible with the current file
+        if brands:
+            found_name = [True for name in brands if name in brand_filepath]
+            if not found_name:
+                continue
+
+        # Load model ids per vendor, from models in this brand file
+        vendors_data = get_vendors_model_ids(brand_filepath)
+        if vendors:
+            # Filter on vendor names
+            vendors_data = {
+                vendor: data
+                for vendor, data in vendors_data.items()
+                if vendor in vendors
+            }
+
+        brand_name = brand_filepath.stem  # TODO: str(brand_filepath.stem).split("_")[0]
+        brands_data[brand_name] = vendors_data
+
+        nb_model_ids = sum(len(ids) for ids in vendors_data.values())
+        LOGGER.info("%s... %d", brand_filepath, nb_model_ids)
+        total += nb_model_ids
+
+    LOGGER.info("TOTAL models from brands loaded: %d", total)
+    return brands_data
 
 
 def load_brand_codes_from_dir(directory):

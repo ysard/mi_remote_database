@@ -27,7 +27,7 @@ from .xiaomi_parser import (
     load_devices,
     load_brand_list,
     load_stp_brand_list,
-    load_brand_codes_from_dir,
+    load_ids_from_brands,
 )
 from .commons import logger
 
@@ -37,6 +37,7 @@ LOGGER = logger()
 def get_json_devices():
     """Get all available devices
 
+    Example of url used:
     `/controller/device/1?version=6034&country=FR&ts=1234&nonce=-1234&opaque=XXX`
     """
     return build_url("/controller/device/1", [])
@@ -45,6 +46,7 @@ def get_json_devices():
 def get_json_brands(device_id):
     """Get all brands available for the given device id
 
+    Example of url used:
     `/controller/brand/list/1?version=6034&country=FR&ts=1234&nonce=1234&devid=1&opaque=XXX`
     """
     return build_url("/controller/brand/list/1", [("devid", device_id)])
@@ -62,9 +64,7 @@ def get_json_stb_brands():
 def get_json_brand(brand_id, device_id, stb=False):
     """Query the API for a brand and return the text result (JSON data)
 
-    URL: `https://urc.io.mi.com/`
-
-    Path:
+    Example of url used:
     `/controller/match/tree/1?version=6034&country=FR&ts=1234&
     nonce=-1234&devid=1&miyk=1&brandid=64&power=1&opaque=XXX`
 
@@ -93,13 +93,11 @@ def get_json_brand(brand_id, device_id, stb=False):
 def get_json_model(matchid, vendorid="mi"):
     """Query the API for a model and return the text result (JSON data)
 
-    URL: https://urc.io.mi.com/
-
-    Path:
+    Example of url used:
     `/controller/code/1?version=6034&country=FR&ts=1234&
     nonce=-1234&matchid=xm_1_199&vendor=mi&opaque=XXX`
-
-    `matchid=1_8582&vendor=kk`
+    or:
+    `...matchid=1_8582&vendor=kk...`
 
     :param matchid: The id of the model to be queried.
     :key vendorid: (Optional) Id of the vendor for which the models are queried.
@@ -125,6 +123,8 @@ def crawl_brands(output_directory, brands, stb=False):
 
     At this step we have (theoretically) only power IR codes for multiple
     models in each brand file.
+
+    Example of files created: Fujitsu_70.json, Sony_141.json, etc.
 
     .. seealso:: :meth:`get_json_brand`
 
@@ -171,7 +171,7 @@ def crawl_models(output_directory, model_ids, vendorid="mi"):
         vendorid. Ids are extracted from brand files for a specific device.
         .. seealso:: :meth:`load_brand_codes_from_dir`
     :key vendorid: (Optional) Id of the vendor for which the models are queried.
-        Possible ids (known until now): `mi (default), kk, mx, yk`.
+        Possible ids (known until now): `mi (default), kk, mx, xm, yk`.
     :type output_directory: <str> or <Path>
     :type model_ids: <set <str>>
     :type vendorid: <str>
@@ -189,10 +189,9 @@ def crawl_models(output_directory, model_ids, vendorid="mi"):
         # Dump the result
         filepath.write_text(json_data)
 
-        LOGGER.info("Done: %s", model_id)
+        LOGGER.debug("Done: %s", model_id)
         # Do not be too harsh with the server...
         time.sleep(0.4)
-        # input("pause")
 
 
 def guess_models(output_directory, ids_range):
@@ -214,10 +213,9 @@ def full_process_device(output_directory, json_device_brands_path, stb=False):
     :type json_device_brands_path: <Path>
     :type stb: <boolean>
     """
-    # Load list of brands
+    # Load list of brands that should be queried
     func = load_stp_brand_list if stb else load_brand_list
     brands = func(json_device_brands_path)
-    # Query data for all brands if dir is empty
     output_directory.mkdir(exist_ok=True)
     # Download brands
     crawl_brands(output_directory, brands, stb=stb)
@@ -227,7 +225,9 @@ def dump_database(*_args, db_path="./database_dump", **_kwargs):
     """Dump all the database into the given directory
 
     - get all devices: mapping deviceid/device type
+        Example of files created: 1_TV.json, 2_Set-top box.json, etc.
     - get all brands per deviceid
+        Example of files created: Fujitsu_70.json, Sony_141.json, etc.
     - get models per brand for each deviceid
     """
     # Get all devices
@@ -248,44 +248,38 @@ def dump_database(*_args, db_path="./database_dump", **_kwargs):
         if not json_device_brands_path.is_file():
             if stb_device:
                 # Handle set-top box devices
-                content = get_json_stb_brands()
+                json_data = get_json_stb_brands()
             else:
-                content = get_json_brands(device_id)
-            Path(json_device_brands_path).write_text(content)
+                json_data = get_json_brands(device_id)
+            Path(json_device_brands_path).write_text(json_data)
 
         device_brands_path = Path(f"{db_path}/{device_id}_{device_name}")
         device_brands_path.mkdir(exist_ok=True)
 
-        # Get all brands definitions (with power IR code) per deviceid
+        # Download all brands definitions (with power IR code) per deviceid
         full_process_device(device_brands_path, json_device_brands_path, stb=stb_device)
 
     # Get models per device
-    # models_path = Path(f"{db_path}/models/")
-    # models_path.mkdir(exist_ok=True)
     for device_id, device in devices.items():
         device_name = device["name"]
         device_brands_path = Path(f"{db_path}/{device_id}_{device_name}")
         models_path = device_brands_path / "models/"
         models_path.mkdir(exist_ok=True)
 
-        models = list(it.chain(*load_brand_codes_from_dir(device_brands_path).values()))
-
-        # Only xiaomi models
-        mi_models = set(
-            it.chain(*[model["keysetids"] for model in models if "keysetids" in model])
+        # Get model ids per vendor per brand
+        brands_data = load_ids_from_brands(device_brands_path)
+        model_ids = set(
+            it.chain(
+                *[
+                    model_ids
+                    for brand, vendors in brands_data.items()
+                    for model_ids in vendors.values()
+                ]
+            )
         )
-        crawl_models(models_path, mi_models)
 
-        # Create sets of model ids for each "others" vendor
-        other_models = ("kk", "mx", "xm", "yk")
-        model_id_sets = [
-            {model["_id"] for model in models if model.get("source") == vendor}
-            for vendor in other_models
-        ]
-
-        for vendor, model_ids in zip(other_models, model_id_sets):
-            LOGGER.info(model_ids)
-            crawl_models(models_path, model_ids, vendorid=vendor)
+        # Download models
+        crawl_models(models_path, model_ids)
 
 
 if __name__ == "__main__":

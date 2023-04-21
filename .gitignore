@@ -1,6 +1,7 @@
 # Various dirs & files
 poc/
 .idea/
+.DS_Store/
 *.json
 *.tar.gz
 *.tar.xz
@@ -23,3 +24,4 @@ coverage.xml
 .pytest_cache/
 
 *.log
+output/
