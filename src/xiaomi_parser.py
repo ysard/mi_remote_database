@@ -451,6 +451,92 @@ def build_patterns(models):
     return patterns
 
 
+def build_all_patterns(brands_data, models_path):
+    """Generate 1 Pattern object (clear IR codes) for each IR code found in the
+    model files corresponding to the given model ids.
+
+    IR codes are decrypted according to :meth:`process_xiaomi_shit`.
+
+    Example of input data:
+
+        {
+            'Fujitsu_70': {
+                'kk': {'kk_*'},
+                'mi': {'xm_*'},
+                ...
+            },
+            ...
+        }
+
+    Example of returned data:
+
+        {
+            'kk_*': [Pattern, ...],
+            'mi_*': [Pattern, ...],
+        }
+
+    :param brands_data: Model ids per vendor per brand.
+        See :meth:`load_ids_from_brands`.
+    :param models_path: Directory path storing all JSON files for models of
+        a type of device.
+    :type brands_data: <dict <dict <str>: <set>>>
+    :type models_path: <Path>
+    :return: Dictionary of model ids as keys and list of Pattern objects as values.
+    :rtype: <dict <str>: <list <Pattern>>>
+    """
+    models = (
+        (brand, vendor_id, model_ids)
+        for brand, vendors in brands_data.items()
+        for vendor_id, model_ids in vendors.items()
+    )
+    # Index to speed up process in case of duplicates
+    patterns = dict()
+    # Final result: model_id as keys, patterns as values
+    models_patterns = defaultdict(list)
+    total_models = 0
+    for brand, vendor_id, model_ids in models:
+        total_models += len(model_ids)
+
+        for model_id in model_ids:
+            filepath = models_path / (model_id + ".json")
+            json_filedata = json.loads(filepath.read_text())
+
+            data = json_filedata["data"]
+            if not data:
+                continue
+            frequency = data["frequency"]
+            if not frequency:
+                LOGGER.error("Bad frequency: %s: %d", filepath, frequency)
+                continue
+
+            # Create 1 pattern object for each key
+            for key_name, ir_cipher in data["key"].items():
+                # Is pattern already built ?
+                pattern_key = (ir_cipher, frequency)
+                pattern = patterns.get(pattern_key)
+                if pattern:
+                    models_patterns[model_id].append(pattern)
+                    continue
+
+                # Decrypt IR code
+                ir_code = process_xiaomi_shit(ir_cipher)
+                pattern = Pattern(
+                    ir_code,
+                    frequency,
+                    name=key_name,
+                    model_id=model_id,
+                    brand_name=brand,
+                    vendor_id=vendor_id,
+                )
+                patterns[pattern_key] = pattern
+                models_patterns[model_id].append(pattern)
+
+    LOGGER.info("Nb brands: %d", len(models_patterns))
+    LOGGER.info("Nb models: %d", total_models)
+    LOGGER.info("Unique patterns: %d", len(patterns))
+    return dict(models_patterns)
+
+
 def get_vendors_model_ids(brand_filepath):
     """Get model ids per vendor, for the given brand file
 
