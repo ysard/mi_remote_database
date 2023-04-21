@@ -17,13 +17,13 @@
 """Entry point and argument parser"""
 # Standard imports
 import itertools as it
-import json
 from pathlib import Path
 import argparse
 
 # Custom imports
 from src.xiaomi_parser import load_brand_codes_from_dir, build_patterns
 from src.xiaomi_query import dump_database, load_devices
+from src.writers import *
 import src.commons as cm
 
 LOGGER = cm.logger()
@@ -90,29 +90,6 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
     else:
         LOGGER.error("To be implemented")
         raise NotImplementedError
-
-
-def tvkill_export(patterns, output, export_filename):
-    """Export Pattern objects to JSON data for TV Kill app
-
-    .. note:: Unique patterns are used to reduce overhead.
-    """
-    code_list = [
-        {
-            "comment": "{} {}".format(code.vendor_id, code.model_id),
-            "frequency": code.frequency,
-            "pattern": code.to_pulses(),
-        }
-        for code in set(patterns)
-    ]
-    tvkill_patterns = {
-        "designation": export_filename,
-        "patterns": code_list,
-    }
-    json_data = json.dumps([tvkill_patterns])  # , indent=2)
-    Path(output, export_filename.replace(" ", "_") + ".json").write_text(
-        json_data
-    )
 
 
 def args_to_param(args):
