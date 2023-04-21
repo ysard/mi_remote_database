@@ -87,6 +87,15 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
         # Load codes from directory
         patterns = load_device_codes(device_path)
         tvkill_export(patterns, output, export_filename)
+    elif format == "flipper":
+        # Here we need ALL IR codes, IR codes stored in JSON brand files
+        # are NOT enough, we MUST use model files.
+        # Load brands data for the given device
+        brands_data = load_ids_from_brands(device_path)
+
+        # Get Patterns for all retrieved models
+        models_patterns = build_all_patterns(brands_data, device_path / "models")
+        flipper_zero_export(models_patterns, output, device_mapping[deviceid])
     else:
         LOGGER.error("To be implemented")
         raise NotImplementedError
