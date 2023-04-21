@@ -14,15 +14,37 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""Functions to export data formatted for the Android App TV Kill"""
 # Standard imports
 import json
 from pathlib import Path
 
 
-def tvkill_export(patterns, output, export_filename):
+def tvkill_export(patterns, output, device_name):
     """Export Pattern objects to JSON data for TV Kill app
 
+    File example:
+
+        [
+            {
+                "designation": "Xiaomi Projector",
+                "patterns": [
+                {
+                    "comment": "kk 111_6667",
+                    "frequency": 37960,
+                    "pattern": [
+                        341,171,20,22,20,...
+                    ]
+                }
+            }
+        ]
+
     .. note:: Unique patterns are used to reduce overhead.
+
+    :param output: Directory where files will be exported
+    :param device_name: Device name (TV, AC, etc.). Used to name the exported file.
+    :type output: <str>
+    :type device_name: <str>
     """
     code_list = [
         {

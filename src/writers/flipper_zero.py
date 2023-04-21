@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""Functions to export data formatted for the Flipper Zero device"""
 # Standard imports
 from string import whitespace
 import re
@@ -21,7 +22,36 @@ from pathlib import Path
 
 
 def flipper_zero_export(models, output, device_name):
-    """Export Pattern objects to ir files required by Flipper Zero device"""
+    """Export Pattern objects to ir files required by Flipper Zero device
+
+    File example:
+
+        Filetype: IR signals file
+        Version: 1
+        # Comments
+        #
+        name: down
+        type: raw
+        frequency: 38000
+        duty_cycle: 0.330000
+        data: ...
+
+    :param models: Dictionary of model ids as keys and list of Pattern objects as values.
+
+        Example:
+
+        {
+            'kk_*': [Pattern, ...],
+            'mi_*': [Pattern, ...],
+        }
+
+    :param output: Directory where files will be exported
+    :param device_name: Device name (TV, AC, etc.). Used to identify the origin
+        of the codes in the ir files.
+    :type models: <dict <str>: <list <Pattern>>>
+    :type output: <str>
+    :type device_name: <str>
+    """
     header_template = """Filetype: IR signals file
 Version: 1
 # Device: {}; Brand: {}; Model: {}; from Mi Remote DB <https://github.com/ysard/mi_remote_database>
