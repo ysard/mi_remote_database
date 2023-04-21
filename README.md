@@ -116,11 +116,12 @@ List the known devices types in the dump:
     Camera: 13
 
 With **this ids mapping you will be able to export codes for a specific device**,
-like shown in the next example.
+like shown in the next section.
+Other formats can be easily implemented by someone who needs it.
 
+## TV Kill Android app
 
 Export IR codes for one device type to the format of [TVKILL](https://github.com/42SK/TVKILL/) Android app.
-Other format can be easily implemented by someone who needs it.
 The number `1` in the command is the internal device id in the database (see above).
 
     $ python -m src db_export -d 1 -f tvkill
@@ -140,6 +141,27 @@ A JSON file (`Xiaomi_TV.json`) will be exported with the following structure as 
             }
         }
     ]
+
+## Flipper Zero
+
+Export is also available for
+[Flipper Zero](https://github.com/flipperdevices/flipperzero-firmware).
+The number `1` in the command is the internal device id in the database (see above).
+
+    $ python -m src db_export -d 1 -f flipper
+
+`ir` files will be exported with the following structure:
+
+    Filetype: IR signals file
+    Version: 1
+    # Comments
+    #
+    name: down
+    type: raw
+    frequency: 38000
+    duty_cycle: 0.330000
+    data: ...
+
 
 # Developers
 
