@@ -37,6 +37,7 @@ LOGGER = logger()
 def get_json_devices():
     """Get all available devices
 
+    Example of url used:
     `/controller/device/1?version=6034&country=FR&ts=1234&nonce=-1234&opaque=XXX`
     """
     return build_url("/controller/device/1", [])
@@ -45,6 +46,7 @@ def get_json_devices():
 def get_json_brands(device_id):
     """Get all brands available for the given device id
 
+    Example of url used:
     `/controller/brand/list/1?version=6034&country=FR&ts=1234&nonce=1234&devid=1&opaque=XXX`
     """
     return build_url("/controller/brand/list/1", [("devid", device_id)])
@@ -62,9 +64,7 @@ def get_json_stb_brands():
 def get_json_brand(brand_id, device_id, stb=False):
     """Query the API for a brand and return the text result (JSON data)
 
-    URL: `https://urc.io.mi.com/`
-
-    Path:
+    Example of url used:
     `/controller/match/tree/1?version=6034&country=FR&ts=1234&
     nonce=-1234&devid=1&miyk=1&brandid=64&power=1&opaque=XXX`
 
@@ -93,13 +93,11 @@ def get_json_brand(brand_id, device_id, stb=False):
 def get_json_model(matchid, vendorid="mi"):
     """Query the API for a model and return the text result (JSON data)
 
-    URL: https://urc.io.mi.com/
-
-    Path:
+    Example of url used:
     `/controller/code/1?version=6034&country=FR&ts=1234&
     nonce=-1234&matchid=xm_1_199&vendor=mi&opaque=XXX`
-
-    `matchid=1_8582&vendor=kk`
+    or:
+    `...matchid=1_8582&vendor=kk...`
 
     :param matchid: The id of the model to be queried.
     :key vendorid: (Optional) Id of the vendor for which the models are queried.
@@ -125,6 +123,8 @@ def crawl_brands(output_directory, brands, stb=False):
 
     At this step we have (theoretically) only power IR codes for multiple
     models in each brand file.
+
+    Example of files created: Fujitsu_70.json, Sony_141.json, etc.
 
     .. seealso:: :meth:`get_json_brand`
 
@@ -225,7 +225,9 @@ def dump_database(*_args, db_path="./database_dump", **_kwargs):
     """Dump all the database into the given directory
 
     - get all devices: mapping deviceid/device type
+        Example of files created: 1_TV.json, 2_Set-top box.json, etc.
     - get all brands per deviceid
+        Example of files created: Fujitsu_70.json, Sony_141.json, etc.
     - get models per brand for each deviceid
     """
     # Get all devices
