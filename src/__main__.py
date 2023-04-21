@@ -21,7 +21,7 @@ from pathlib import Path
 import argparse
 
 # Custom imports
-from src.xiaomi_parser import load_brand_codes_from_dir, build_patterns
+from src.xiaomi_parser import load_brand_codes_from_dir, build_patterns, load_ids_from_brands, build_all_patterns
 from src.xiaomi_query import dump_database, load_devices
 from src.writers import *
 import src.commons as cm
