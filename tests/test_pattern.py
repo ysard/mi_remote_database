@@ -46,6 +46,12 @@ def test_to_pulses(ir_code, pulse_code):
     print(found)
     assert pulse_code == found
 
+    # Missing frequency
+    with pytest.raises(
+            AssertionError, match="Missing frequency argument for the given code_type!"
+    ):
+        _ = Pattern(ir_code, code_type="raw")
+
 
 def test_to_pronto(ir_code, pronto_code):
     """Test conversion and ability to detect 2 sequences in IR pulses"""
@@ -97,3 +103,17 @@ def test_from_pulses(ir_code, pulse_code):
     # All values must be True (no significative diff)
     print(diff_result, all(diff_result))
     assert all(diff_result)
+
+
+def test_magic_functions(ir_code):
+    """Test uniqueness & hash capacities of Pattern objects"""
+    pattern_1 = Pattern(ir_code, 37990, code_type="raw")
+    pattern_2 = Pattern(ir_code, 37990)
+    pattern_3 = Pattern(ir_code, 38000, code_type="raw")
+
+    assert pattern_1 == pattern_2
+    assert pattern_1 != pattern_3
+
+    uniq_patterns = {pattern_1, pattern_2, pattern_3}
+
+    assert len(uniq_patterns) == 2
