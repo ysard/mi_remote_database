@@ -192,7 +192,6 @@ def crawl_models(output_directory, model_ids, vendorid="mi"):
         LOGGER.debug("Done: %s", model_id)
         # Do not be too harsh with the server...
         time.sleep(0.4)
-        # input("pause")
 
 
 def guess_models(output_directory, ids_range):
@@ -267,7 +266,15 @@ def dump_database(*_args, db_path="./database_dump", **_kwargs):
 
         # Get model ids per vendor per brand
         brands_data = load_ids_from_brands(device_brands_path)
-        model_ids = set(it.chain(*[model_ids for brand, vendors in brands_data.items() for model_ids in vendors.values()]))
+        model_ids = set(
+            it.chain(
+                *[
+                    model_ids
+                    for brand, vendors in brands_data.items()
+                    for model_ids in vendors.values()
+                ]
+            )
+        )
 
         # Download models
         crawl_models(models_path, model_ids)
