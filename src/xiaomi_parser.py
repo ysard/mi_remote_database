@@ -345,6 +345,7 @@ def load_brand_codes(filename):
     """
 
     def parse_others_section(section):
+        """Temp function to handle 'others' key of a brand JSON description"""
         # TODO: filter on other keys than power/power_r/shutter
 
         for json_model in section:
