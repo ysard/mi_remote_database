@@ -65,16 +65,16 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
 
     # Display available devices if asked
     if list_devices:
-        print("Device Name: Device ID")
+        print("Device ID: Device Name")
         for dev_name, dev_id in device_mapping.items():
             print(f"{dev_name}: {dev_id}")
         raise SystemExit(0)
 
     # Expect directory <db_dir>/<int>_<device_name>/
     found_dirs = [p for p in Path(db_path).glob(f"{deviceid}_*") if p.is_dir()]
-    db_dir = found_dirs[0] if len(found_dirs) == 1 else None
+    device_path = found_dirs[0] if len(found_dirs) == 1 else None
 
-    if not db_dir:
+    if not device_path:
         LOGGER.error(
             "Missing device files or wrong directory: %s/%s_*/", db_path, deviceid
         )
@@ -83,10 +83,9 @@ def db_export(deviceid=None, format=None, list_devices=False, db_path=None, outp
     # Build export filename based on device name
     export_filename = f"{format} Xiaomi_" + device_mapping[deviceid]
 
-    # Load codes from directory
-    patterns = load_device_codes(db_dir)
-
     if format == "tvkill":
+        # Load codes from directory
+        patterns = load_device_codes(device_path)
         tvkill_export(patterns, output, export_filename)
     else:
         LOGGER.error("To be implemented")
