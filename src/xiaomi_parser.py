@@ -485,6 +485,7 @@ def build_all_patterns(brands_data, models_path):
     :type brands_data: <dict <dict <str>: <set>>>
     :type models_path: <Path>
     :return: Dictionary of model ids as keys and list of Pattern objects as values.
+        .. note:: Empty models ARE NOT returned.
     :rtype: <dict <str>: <list <Pattern>>>
     """
     models = (
