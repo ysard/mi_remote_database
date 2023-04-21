@@ -13,6 +13,9 @@ coverage:
 docstring_coverage:
 	interrogate -v src/ -e src/__init__.py --ignore-magic --badge-style flat --generate-badge ./assets/
 
+coverage_badge:
+	coverage-badge -f -o ./assets/coverage.svg
+
 compress_db:
 	XZ_OPT=-9 tar Jcvf database_dump.tar.xz ./database_dump/
 	@#tar -I "pxz -9" -cvf database_dump.tar.xz ./database_dump/
