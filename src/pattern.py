@@ -58,7 +58,7 @@ class Pattern:
     Python sets can be made to ensure the uniqueness of Pattern objects.
     """
 
-    def __init__(self, ir_code, frequency=None, code_type="raw", model_id=None, vendor_id=None):
+    def __init__(self, ir_code, frequency=None, code_type="raw", name=None, brand_name=None, model_id=None, vendor_id=None):
         """
         :param ir_code: IR code; Raw timmings by default. If different type,
             set `code_type` argument.
@@ -77,10 +77,10 @@ class Pattern:
         if code_type in ("raw", "pulses"):
             assert frequency
 
+        self.brand = brand_name
+        self.name = name
         self.model_id = model_id
         self.vendor_id = vendor_id
-        self.code_type = code_type
-        self.from_bytes = partial(int.from_bytes, byteorder="big")
         self.ir_code, self.frequency = convert_funcs[code_type](ir_code, frequency)
 
     def to_pronto(self):
@@ -149,7 +149,8 @@ class Pattern:
         :rtype: <<tuple <tuple <int>>, <int>>
         """
         # Convert hex pulse words (4 symbols) to ints
-        pronto = [self.from_bytes(bytes.fromhex(i)) for i in ir_code.split()]
+        from_bytes = partial(int.from_bytes, byteorder="big")
+        pronto = [from_bytes(bytes.fromhex(i)) for i in ir_code.split()]
 
         # Test leading null word
         assert pronto[0] == 0
