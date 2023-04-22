@@ -435,7 +435,6 @@ def build_patterns(models):
             model_id=model.get("_id", model.get("keysetids")),
             vendor_id=model.get("source", "mi"),
         )
-        # print(pattern.to_pronto())
         patterns.append(pattern)
 
         # Optional reverse code = separated Pattern
@@ -448,7 +447,6 @@ def build_patterns(models):
                 model_id=model.get("_id", model.get("keysetids")),
                 vendor_id=model.get("source", "mi"),
             )
-            # print(pattern.to_pronto())
             patterns.append(pattern)
 
     return patterns
@@ -641,7 +639,7 @@ def load_ids_from_brands(device_path, brands=tuple(), vendors=tuple()):
     return brands_data
 
 
-def load_brand_codes_from_dir(directory):
+def load_brand_codes_from_dir(device_path):
     """Extract IR encrypted codes for models from all brands in the given directory
 
     .. seealso:: :meth:`load_brand_codes`
@@ -652,13 +650,12 @@ def load_brand_codes_from_dir(directory):
     """
     total = 0
     models = dict()
-    for json_file in Path(directory).glob("*.json"):
-        print(json_file, "...", end="")
+    for brand_filepath in Path(device_path).glob("*.json"):
         # Load codes from models in this brand file
-        temp_models = load_brand_codes(json_file)
-        models[json_file.stem] = temp_models
-        print(len(temp_models))
+        temp_models = load_brand_codes(brand_filepath)
+        models[brand_filepath.stem] = temp_models
         total += len(temp_models)
+        LOGGER.info("%s... %d", brand_filepath, len(temp_models))
 
-    print("TOTAL loaded", total)
+    LOGGER.info("TOTAL models from brands loaded: %d", total)
     return models
