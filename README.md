@@ -132,9 +132,10 @@ GitHub assets, or if you want to update it).
     specific devic or brande**, like shown in the next section.
     Other formats can be easily implemented by someone who needs it.
 
-- Filtering brand names is possible by using `--brands` argument:
+- Filtering brand and key names is possible by using `--brands` and
+ `--keys` argument:
 
-        $ python -m src db_export -d 1 --brands Fujitsu,Sony -f flipper
+        $ python -m src db_export -d 1 --brands Fujitsu Sony -k power power_r -f flipper
         ...
         Nb brands: 2
         Nb models: 10
