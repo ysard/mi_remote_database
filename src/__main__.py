@@ -99,12 +99,6 @@ def db_export(deviceid=None, format=None, db_path=None, output=None, **kwargs):
     elif format == "flipper":
         # Prepare filtering on brands
         queried_brands = kwargs.get("brands")
-        if queried_brands:
-            queried_brands = {
-                name for name in queried_brands.rstrip().split(",") if name
-            }
-        else:
-            queried_brands = tuple()
 
         # Here we need ALL IR codes, IR codes stored in JSON brand files
         # are NOT enough, we MUST use model files.
@@ -226,9 +220,9 @@ def main():
     parser_export.add_argument(
         "-b",
         "--brands",
-        help="Filter on brand names/ids. Items must be coma "
-        "separated. Ex: <Fujitsu,Sony>.",
-        default=None,
+        help="Filter on brand names/ids. Items must be space separated. "
+        "Ex: <Fujitsu Sony>.",
+        nargs="*",
     )
     parser_export.add_argument(
         "-f", "--format", help="Export format (tvkill for now)", default="tvkill"
