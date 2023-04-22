@@ -497,6 +497,8 @@ def build_all_patterns(brands_data, models_path, keys=tuple()):
 
         for model_id in model_ids:
             filepath = models_path / (model_id + ".json")
+            if not filepath.exists():
+                continue
             json_filedata = json.loads(filepath.read_text())
 
             data = json_filedata["data"]
