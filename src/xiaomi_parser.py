@@ -445,7 +445,7 @@ def build_patterns(models):
     return patterns
 
 
-def build_all_patterns(brands_data, models_path):
+def build_all_patterns(brands_data, models_path, keys=tuple()):
     """Generate 1 Pattern object (clear IR codes) for each IR code found in the
     model files corresponding to the given model ids.
 
@@ -473,8 +473,11 @@ def build_all_patterns(brands_data, models_path):
         See :meth:`load_ids_from_brands`.
     :param models_path: Directory path storing all JSON files for models of
         a type of device.
+    :key keys: Iterable of key names to retrieve. Non-matching names will
+        be dropped. Default: No filtering.
     :type brands_data: <dict <dict <str>: <set>>>
     :type models_path: <Path>
+    :type keys: <tuple> or <set>
     :return: Dictionary of model ids as keys and list of Pattern objects as values.
         .. note:: Empty models ARE NOT returned.
     :rtype: <dict <str>: <list <Pattern>>>
@@ -506,6 +509,9 @@ def build_all_patterns(brands_data, models_path):
 
             # Create 1 pattern object for each key
             for key_name, ir_cipher in data["key"].items():
+                # Filter keys
+                if keys and key_name not in keys:
+                    continue
                 # Is pattern already built ?
                 pattern_key = (ir_cipher, frequency)
                 pattern = patterns.get(pattern_key)

@@ -99,6 +99,8 @@ def db_export(deviceid=None, format=None, db_path=None, output=None, **kwargs):
     elif format == "flipper":
         # Prepare filtering on brands
         queried_brands = kwargs.get("brands")
+        # Prepare filtering on keys
+        keys = frozenset(kwargs.get("keys"))
 
         # Here we need ALL IR codes, IR codes stored in JSON brand files
         # are NOT enough, we MUST use model files.
@@ -106,7 +108,7 @@ def db_export(deviceid=None, format=None, db_path=None, output=None, **kwargs):
         brands_data = load_ids_from_brands(device_path, brands=queried_brands)
 
         # Get Patterns for all retrieved models
-        models_patterns = build_all_patterns(brands_data, device_path / "models")
+        models_patterns = build_all_patterns(brands_data, device_path / "models", keys=keys)
         flipper_zero_export(models_patterns, output, device_mapping[deviceid])
     else:
         LOGGER.error("To be implemented")
