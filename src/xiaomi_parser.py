@@ -596,7 +596,7 @@ def load_ids_from_brands(device_path, brands=tuple(), vendors=tuple()):
         a type of device.
     :key: brands: Iterable of brand names to retrieve. Non-matching names will
         be dropped. Default: No filtering.
-    :key: vendors: Iterable of vendors to retrive. Non-matching names will
+    :key: vendors: Iterable of vendors to retrieve. Non-matching names will
         be dropped. Default: No filtering.
     :type brands: <tuple>
     :type vendors: <tuple>
