@@ -22,7 +22,7 @@ Data from the DB could be localized (not really studied at the moment);
 however, codes are currently queried for France and by extension for Europe (I guess...).
 
 Please note that the following numbers are for *power codes* (ON/OFF codes) **only**.
-The number of patterns for other commands **is much more important**.
+The number of patterns for other commands **is much more important** (see below).
 
     TV codes:
     Nb brands: 1060
@@ -78,6 +78,58 @@ The number of patterns for other commands **is much more important**.
     Nb models: 17
     Nb Patterns: 17
     Nb unique patterns: 16
+
+
+Stats for all key codes:
+
+    TV codes:
+    Nb brands: 1060
+    Nb models: 2832
+    Unique patterns: 45661
+
+    Set-top box:
+    Nb brands: 43
+    Nb models: 172
+    Unique patterns: 3134
+
+    Air conditioners:
+    Nb brands: 280
+    Nb models: 1828
+    Unique patterns: 507
+
+    DVD players:
+    Nb brands: 247
+    Nb models: 838
+    Unique patterns: 25921
+
+    Fans:
+    Nb brands: 133
+    Nb models: 422
+    Unique patterns: 1435
+
+    Audio/video:
+    Nb models: 455
+    Unique patterns: 8355
+
+    Projectors:
+    Nb brands: 118
+    Nb models: 370
+    Unique patterns: 5430
+
+    Cable _ Satellite box
+    Nb brands: 2
+    Nb models: 13
+    Unique patterns: 548
+
+    Internet Box:
+    Nb brands: 136
+    Nb models: 221
+    Unique patterns: 3945
+
+    Camera:
+    Nb brands: 12
+    Nb models: 18
+    Unique patterns: 111
 
 
 # Installation
