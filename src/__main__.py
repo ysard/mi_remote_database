@@ -225,6 +225,15 @@ def main():
         help="Filter on brand names/ids. Items must be space separated. "
         "Ex: <Fujitsu Sony>.",
         nargs="*",
+        default=tuple()
+    )
+    parser_export.add_argument(
+        "-k",
+        "--keys",
+        help="Filter on key names. Items must be space separated. "
+        "Ex: <power power_r shutter>.",
+        nargs="*",
+        default=tuple()
     )
     parser_export.add_argument(
         "-f", "--format", help="Export format (tvkill for now)", default="tvkill"
