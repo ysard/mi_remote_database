@@ -14,12 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""Parse data from Xiaomi API
-
-TODO: make uniq patterns => option
-TODO: get "others" section with an option
-TODO: put the deviceid/vendorid in the Pattern object
-"""
+"""Parse data from Xiaomi API"""
 # Standard imports
 import json
 from pathlib import Path
@@ -27,7 +22,7 @@ import itertools as it
 from collections import defaultdict
 
 # Custom imports
-from .crypt_utils import build_url, process_xiaomi_shit
+from .crypt_utils import process_xiaomi_shit
 from .pattern import Pattern
 from .commons import logger
 
@@ -384,14 +379,12 @@ def load_brand_codes(filename):
         ]
 
     ############################################################################
-
+    # Usual data from "mi" vendor
     tree = json_filedata["data"]["tree"]
-
-    if "seceret_key" not in tree:
+    if not tree:
         # Empty tree
         return models
 
-    assert tree["seceret_key"] is None  # TODO: To be identified correctly later
     json_models = tree["nodes"]
     for json_model in json_models[1:]:  # Skip the first element: "children_index"
         model = {
