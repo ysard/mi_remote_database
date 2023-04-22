@@ -4,6 +4,9 @@ db_dump:
 export_TV:
 	python -m src db_export -d 1 -f tvkill
 
+export_flipper:
+	python -m src db_export -d 1 -f flipper
+
 tests:
 	pytest -v tests/
 
