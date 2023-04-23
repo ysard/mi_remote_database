@@ -46,19 +46,19 @@ def tvkill_export(patterns, output, device_name):
     :type output: <str>
     :type device_name: <str>
     """
-    code_list = [
+    json_patterns = [
         {
-            "comment": "{} {}".format(code.vendor_id, code.model_id),
-            "frequency": code.frequency,
-            "pattern": code.to_pulses(),
+            "comment": "{} {}".format(pattern.vendor_id, pattern.model_id),
+            "frequency": pattern.frequency,
+            "pattern": pattern.to_pulses(),
         }
-        for code in set(patterns)
+        for pattern in set(patterns)
     ]
     tvkill_patterns = {
-        "designation": "Xiaomi "
+        "designation": "Xiaomi '"
         + device_name
-        + "from Mi Remote DB <https://github.com/ysard/mi_remote_database>",
-        "patterns": code_list,
+        + "' from Mi Remote DB <https://github.com/ysard/mi_remote_database>",
+        "patterns": json_patterns,
     }
     json_data = json.dumps([tvkill_patterns])  # , indent=2)
 
