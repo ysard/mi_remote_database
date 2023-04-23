@@ -4,10 +4,11 @@ from collections import Counter
 from pathlib import Path
 import json
 import pytest
+
 # Custom imports
-from .test_pattern import ir_code
 from src.pattern import Pattern
 from src.writers import flipper_zero_export, tvkill_export
+from tests.test_pattern import ir_code
 
 
 @pytest.fixture()
@@ -28,8 +29,8 @@ def test_flipper(tmp_path, ir_code, pattern_examples):
     pattern_1, pattern_2 = pattern_examples
 
     fake_data = {
-        'kk_1': [pattern_1, pattern_2],
-        'mi_1': [pattern_1, pattern_2],
+        "kk_1": [pattern_1, pattern_2],
+        "mi_1": [pattern_1, pattern_2],
     }
 
     flipper_zero_export(fake_data, tmp_path, "Fake Device")
@@ -76,11 +77,16 @@ def test_tvkill_export(tmp_path, pattern_examples):
 
     # Build export filename based on device name
     export_filename = "TVKill_Xiaomi_" + device_name
-    found_content = json.loads(Path(tmp_path, export_filename.replace(" ", "_") + ".json").read_text())[0]
+    found_content = json.loads(
+        Path(tmp_path, export_filename.replace(" ", "_") + ".json").read_text()
+    )[0]
 
     print(found_content)
     # Test designation key
-    assert found_content["designation"] == "Xiaomi 'Fake Device' from Mi Remote DB <https://github.com/ysard/mi_remote_database>"
+    assert (
+        found_content["designation"]
+        == "Xiaomi 'Fake Device' from Mi Remote DB <https://github.com/ysard/mi_remote_database>"
+    )
 
     found_patterns = found_content["patterns"]
     assert len(found_patterns) == 2
