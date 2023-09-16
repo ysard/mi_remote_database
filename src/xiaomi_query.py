@@ -150,7 +150,7 @@ def crawl_brands(output_directory, brands, stb=False):
         json_data = get_json_brand(brand_id, device_id, stb=stb)
 
         # Dump the result
-        filepath.write_text(json_data)
+        filepath.write_text(json_data, encoding="utf-8")
 
         LOGGER.info("Done: %s", brand_id)
         # Do not be too harsh with the server...
@@ -187,7 +187,7 @@ def crawl_models(output_directory, model_ids, vendorid="mi"):
         json_data = get_json_model(model_id, vendorid=vendorid)
 
         # Dump the result
-        filepath.write_text(json_data)
+        filepath.write_text(json_data, encoding="utf-8")
 
         LOGGER.debug("Done: %s", model_id)
         # Do not be too harsh with the server...
@@ -233,7 +233,7 @@ def dump_database(*_args, db_path="./database_dump", **_kwargs):
     # Get all devices
     json_devices_path = Path(f"{db_path}/devices.json")
     if not json_devices_path.is_file():
-        Path(json_devices_path).write_text(get_json_devices())
+        Path(json_devices_path).write_text(get_json_devices(), encoding="utf-8")
 
     # Data ex: {1: {'name': 'TV'}, ...}
     devices = load_devices(json_devices_path)
@@ -251,7 +251,7 @@ def dump_database(*_args, db_path="./database_dump", **_kwargs):
                 json_data = get_json_stb_brands()
             else:
                 json_data = get_json_brands(device_id)
-            Path(json_device_brands_path).write_text(json_data)
+            Path(json_device_brands_path).write_text(json_data, encoding="utf-8")
 
         device_brands_path = Path(f"{db_path}/{device_id}_{device_name}")
         device_brands_path.mkdir(exist_ok=True)

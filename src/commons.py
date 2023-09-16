@@ -64,6 +64,7 @@ file_handler = RotatingFileHandler(
     "a",
     100_000_000,
     1,
+    encoding="utf-8"
 )
 file_handler.setLevel(LOG_LEVEL)
 file_handler.setFormatter(formatter)

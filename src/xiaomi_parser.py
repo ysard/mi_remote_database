@@ -49,7 +49,7 @@ def load_devices(filename):
         device description as values.
     :rtype: <dict <int>: <dict>>
     """
-    json_filedata = json.loads(Path(filename).read_text())
+    json_filedata = json.loads(Path(filename).read_text(encoding="utf-8"))
     devices = dict()
 
     for json_device in json_filedata["data"]:
@@ -170,7 +170,7 @@ def load_brand_list(filename):
         Used keys from JSON: brandid, deviceid, name
     :rtype: <dict <int>:<dict>>
     """
-    json_filedata = json.loads(Path(filename).read_text())
+    json_filedata = json.loads(Path(filename).read_text(encoding="utf-8"))
 
     brands = dict()
     json_brands = json_filedata["data"]
@@ -217,7 +217,7 @@ def load_stp_brand_list(filename):
         Used keys from JSON: brandid, deviceid, name
     :rtype: <dict <str>:<dict>>
     """
-    json_filedata = json.loads(Path(filename).read_text())
+    json_filedata = json.loads(Path(filename).read_text(encoding="utf-8"))
 
     brands = dict()
     json_brands = json_filedata["data"]["data"]
@@ -370,7 +370,7 @@ def load_brand_codes(filename):
 
             yield model
 
-    json_filedata = json.loads(Path(filename).read_text())
+    json_filedata = json.loads(Path(filename).read_text(encoding="utf-8"))
     models = list()
 
     if "others" in json_filedata["data"]:
@@ -499,7 +499,7 @@ def build_all_patterns(brands_data, models_path, keys=tuple()):
             filepath = models_path / (model_id + ".json")
             if not filepath.exists():
                 continue
-            json_filedata = json.loads(filepath.read_text())
+            json_filedata = json.loads(filepath.read_text(encoding="utf-8"))
 
             data = json_filedata["data"]
             if not data:
@@ -558,7 +558,7 @@ def get_vendors_model_ids(brand_filepath):
         'mi' vendor should be set most of the time but not guaranteed.
     :rtype: <dict <str>: <set>>
     """
-    json_filedata = json.loads(Path(brand_filepath).read_text())
+    json_filedata = json.loads(Path(brand_filepath).read_text(encoding="utf-8"))
 
     data = json_filedata["data"]
     model_ids = defaultdict(set)
