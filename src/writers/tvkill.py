@@ -64,4 +64,4 @@ def tvkill_export(patterns, output, device_name):
 
     # Build export filename based on device name
     export_filename = "TVKill_Xiaomi_" + device_name
-    Path(output, export_filename.replace(" ", "_") + ".json").write_text(json_data)
+    Path(output, export_filename.replace(" ", "_") + ".json").write_text(json_data, encoding="utf-8")

@@ -80,4 +80,4 @@ Version: 1
 
         # Dump
         path = Path(output) / f"{brand}_{model_id}.ir"
-        path.write_text(content)
+        path.write_text(content, encoding="utf-8")
