@@ -105,7 +105,7 @@ class Pattern:
         ir_code = [to_padded_hex(i) for i in self.to_pulses()]
 
         # Bursts should be a multiple of 2: Burst pairs (On/Off)
-        if len(ir_code) % 2 == 0:
+        if len(ir_code) % 2 != 0:
             print("WARNING: Burst pairs are not complete: odd number")
 
         # Try to detect number and size of sequences

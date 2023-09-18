@@ -53,7 +53,7 @@ def test_to_pulses(ir_code, pulse_code):
         _ = Pattern(ir_code, code_type="raw")
 
 
-def test_to_pronto(ir_code, pronto_code):
+def test_to_pronto(ir_code, pronto_code, capsys):
     """Test conversion and ability to detect 2 sequences in IR pulses"""
     pattern = Pattern(ir_code, 37990, code_type="raw")
     print(pattern)
@@ -61,6 +61,14 @@ def test_to_pronto(ir_code, pronto_code):
 
     print(found)
     assert pronto_code == found
+
+    # Test Odd number of burst values
+    ir_code.pop()
+    pattern = Pattern(ir_code, 37990, code_type="raw")
+    found = pattern.to_pronto()
+    captured = capsys.readouterr()
+    print(found)
+    assert "Burst pairs are not complete" in captured.out
 
 
 def test_to_signed_raw(ir_code):
