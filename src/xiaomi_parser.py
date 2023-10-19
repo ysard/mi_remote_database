@@ -183,7 +183,7 @@ def load_brand_list(filename):
         device_id = brand["deviceid"]
         # print(brand_name, brand_id, type(brand_id))
         brands[brand_id] = {
-            "name": brand_name,
+            "name": brand_name.replace("\n", ""),
             "deviceid": device_id,
         }
     return brands
