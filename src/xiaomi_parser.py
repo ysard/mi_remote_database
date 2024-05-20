@@ -178,7 +178,7 @@ def load_brand_list(filename):
         # Get the occidental name of the brand
         # Assume EN language is always set
         info = brand["info"]
-        brand_name = [item["name"] for item in info if item["country"] == "EN"][0]
+        brand_name = [item["name"] for item in info if item["country"] == "EN"][0]  # TODO some cleaning
         brand_id = brand["brandid"]
         device_id = brand["deviceid"]
         # print(brand_name, brand_id, type(brand_id))
@@ -224,7 +224,7 @@ def load_stp_brand_list(filename):
     for brand in json_brands:
         # print(brand["name"], brand["sp"], type(brand["sp"]))
         brands[brand["sp"]] = {
-            "name": brand["name"],
+            "name": brand["name"].replace("\n", ""),  # TODO: cleaning
             "deviceid": 2,
         }
     return brands
