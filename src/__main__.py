@@ -93,7 +93,7 @@ def db_export(deviceid=None, format=None, db_path=None, output=None, **kwargs):
     device_path = check_device_path(db_path, deviceid)
 
     if format == "tvkill":
-        # Load codes from brands
+        # Load codes from all brands
         patterns = load_device_codes(device_path)
         tvkill_export(patterns, output, device_mapping[deviceid])
     elif format == "flipper":
@@ -236,7 +236,7 @@ def main():
         default=tuple()
     )
     parser_export.add_argument(
-        "-f", "--format", help="Export format (tvkill for now)", default="tvkill"
+        "-f", "--format", help="Export format (tvkill (only power codes), flipper)", default="tvkill"
     )
     parser_export.add_argument(
         "-o",
