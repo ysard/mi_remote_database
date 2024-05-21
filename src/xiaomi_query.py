@@ -259,6 +259,7 @@ def dump_database(*_args, db_path="./database_dump", **_kwargs):
         device_brands_path.mkdir(exist_ok=True)
 
         # Download all brands definitions (with power IR code) per deviceid
+        LOGGER.info("Downloading device: %s", device_name)
         full_process_device(device_brands_path, json_device_brands_path, stb=stb_device)
 
     # Get models per device
