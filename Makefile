@@ -2,9 +2,11 @@ db_dump:
 	python -m src db_dump
 
 export_TV:
+	# Exporting in TVkill format for TV device
 	python -m src db_export -d 1 -f tvkill
 
 export_flipper:
+	# Exporting in flipper format for TV device
 	python -m src db_export -d 1 -f flipper
 
 tests:
