@@ -21,71 +21,68 @@ Full database and [TVKILL](https://github.com/42SK/TVKILL/) exports are availabl
 Data from the DB could be localized (not really studied at the moment);
 however, codes are currently queried for France and by extension for Europe (I guess...).
 
-Please note that the following numbers are for *power codes* (ON/OFF codes) **only**.
+Please note that the following numbers are for *power codes* (ON/OFF codes) **only**
+(`python -m src db_export -f flipper -k power power_r -d xxx`).
 The number of patterns for other commands **is much more important** (see below).
 
     TV codes:
     Nb brands: 1060
-    Nb models: 2634
-    Nb Patterns: 2998
-    Nb unique patterns: 1290
+    Nb models: 2848
+    Nb unique patterns: 1346
 
     Set-top box:
     Nb brands: 43
-    Nb models: 152
-    Nb Patterns: 169
-    Nb unique patterns: 117
+    Nb models: 172
+    Nb unique patterns: 134
 
     Air conditioners:
     Nb brands: 280
-    Nb models: 67
-    Nb Patterns: 67
-    Nb unique patterns: 50
+    Nb models: 1828
+    Nb unique patterns: ??
     (much more in fact, but patterns are crypted and not reversed for now)
 
     DVD players:
     Nb brands: 247
-    Nb models: 579
-    Nb Patterns: 608
-    Nb unique patterns: 577
+    Nb models: 839
+    Nb unique patterns: 775
 
     Fans:
     Nb brands: 133
-    Nb models: 417
-    Nb Patterns: 434
+    Nb models: 422
     Nb unique patterns: 191
 
     Audio/video:
     Nb brands: 202
-    Nb models: 432
-    Nb Patterns: 505
+    Nb models: 455
     Nb unique patterns: 446
 
     Projectors:
     Nb brands: 118
-    Nb models: 364
-    Nb Patterns: 385
+    Nb models: 370
     Nb unique patterns: 274
+
+    Cable _ Satellite box
+    Nb brands: 2
+    Nb models: 13
+    Unique patterns: 14
 
     Internet Box:
     Nb brands: 136
-    Nb models: 213
-    Nb Patterns: 214
+    Nb models: 221
     Nb unique patterns: 140
 
     Camera:
     Nb brands: 12
-    Nb models: 17
-    Nb Patterns: 17
-    Nb unique patterns: 16
+    Nb models: 18
+    Nb unique patterns: 4
 
 
-Stats for all key codes:
+Stats for all key codes (`python -m src db_export -f flipper -d xxx`):
 
     TV codes:
     Nb brands: 1060
-    Nb models: 2832
-    Unique patterns: 45661
+    Nb models: 2848
+    Unique patterns: 46228
 
     Set-top box:
     Nb brands: 43
@@ -99,8 +96,8 @@ Stats for all key codes:
 
     DVD players:
     Nb brands: 247
-    Nb models: 838
-    Unique patterns: 25921
+    Nb models: 839
+    Unique patterns: 25954
 
     Fans:
     Nb brands: 133
@@ -108,13 +105,14 @@ Stats for all key codes:
     Unique patterns: 1435
 
     Audio/video:
+    Nb brands: 202
     Nb models: 455
-    Unique patterns: 8355
+    Unique patterns: 8615
 
     Projectors:
     Nb brands: 118
     Nb models: 370
-    Unique patterns: 5430
+    Unique patterns: 5518
 
     Cable _ Satellite box
     Nb brands: 2
@@ -124,12 +122,12 @@ Stats for all key codes:
     Internet Box:
     Nb brands: 136
     Nb models: 221
-    Unique patterns: 3945
+    Unique patterns: 4031
 
     Camera:
     Nb brands: 12
     Nb models: 18
-    Unique patterns: 111
+    Unique patterns: 113
 
 
 # Installation
