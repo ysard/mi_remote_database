@@ -277,10 +277,7 @@ def dump_database(*_args, db_path="./database_dump", **_kwargs):
         # but global progression will be impossible.
         # - Also avoid multiple downloads for a model
         model_ids_per_vendors = defaultdict(set)
-        g = (
-            (vendor_id, model_ids) for vendor in brands_data.values()
-            for vendor_id, model_ids in vendor.items()
-        )
+        g = it.chain(*[vendor.items() for vendor in brands_data.values()])
         for vendor_id, model_ids in g:
             model_ids_per_vendors[vendor_id].update(model_ids)
 
