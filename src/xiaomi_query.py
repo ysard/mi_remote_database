@@ -20,6 +20,7 @@ import time
 import itertools as it
 from pathlib import Path
 from random import shuffle
+from collections import defaultdict
 
 # Custom imports
 from .crypt_utils import build_url
@@ -269,18 +270,23 @@ def dump_database(*_args, db_path="./database_dump", **_kwargs):
 
         # Get model ids per vendor per brand
         brands_data = load_ids_from_brands(device_brands_path)
-        model_ids = set(
-            it.chain(
-                *[
-                    model_ids
-                    for brand, vendors in brands_data.items()
-                    for model_ids in vendors.values()
-                ]
-            )
-        )
 
-        # Download models
-        crawl_models(models_path, model_ids)
+        # Merge all vendors and their model_ids for the current device
+        # - Could iterate over brands and download instead merging,
+        # but global progression will be impossible.
+        # - Also avoid multiple downloads for a model
+        model_ids_per_vendors = defaultdict(set)
+        g = (
+            (vendor_id, model_ids) for vendor in brands_data.values()
+            for vendor_id, model_ids in vendor.items()
+        )
+        for vendor_id, model_ids in g:
+            model_ids_per_vendors[vendor_id].update(model_ids)
+
+        for vendor_id, model_ids in model_ids_per_vendors.items():
+            LOGGER.info("Downloading models for vendor %s, device: %s", vendor_id, device_name)
+            # Download models
+            crawl_models(models_path, model_ids, vendorid=vendor_id)
 
 
 if __name__ == "__main__":
