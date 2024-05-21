@@ -152,7 +152,7 @@ def crawl_brands(output_directory, brands, stb=False):
         # Dump the result
         filepath.write_text(json_data, encoding="utf-8")
 
-        LOGGER.info("Done: %s", brand_id)
+        LOGGER.debug("Done: %s", brand_id)
         # Do not be too harsh with the server...
         time.sleep(0.4)
 

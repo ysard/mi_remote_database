@@ -65,7 +65,7 @@ def load_devices(filename):
 
 
 def load_brand_list(filename):
-    """Get brands from JSON dump
+    r"""Get brands from JSON dump
 
     Device file data example:
 
@@ -231,7 +231,7 @@ def load_stp_brand_list(filename):
 
 
 def load_brand_codes(filename):
-    """Extract IR encrypted codes for each model from a given JSON dump of a brand
+    r"""Extract IR encrypted codes for each model from a given JSON dump of a brand
 
     {
        "status":0,
