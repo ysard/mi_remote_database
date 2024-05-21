@@ -154,7 +154,7 @@ def crawl_brands(output_directory, brands, stb=False):
 
         LOGGER.debug("Done: %s", brand_id)
         # Do not be too harsh with the server...
-        time.sleep(0.4)
+        time.sleep(0.2)
 
 
 def crawl_models(output_directory, model_ids, vendorid="mi"):
@@ -191,7 +191,7 @@ def crawl_models(output_directory, model_ids, vendorid="mi"):
 
         LOGGER.debug("Done: %s", model_id)
         # Do not be too harsh with the server...
-        time.sleep(0.4)
+        time.sleep(0.2)
 
 
 def guess_models(output_directory, ids_range):
