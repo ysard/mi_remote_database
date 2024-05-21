@@ -3,7 +3,6 @@
 from logging.handlers import RotatingFileHandler
 import logging
 import datetime as dt
-from pkg_resources import resource_filename
 
 # Paths
 DIR_LOGS = "./"
