@@ -178,7 +178,8 @@ def crawl_models(output_directory, model_ids, vendorid="mi"):
     """
     total = len(model_ids)
 
-    for index, model_id in enumerate(model_ids):
+    # Sort before iterating: better output for progression if files are akready downloaded
+    for index, model_id in enumerate(sorted(model_ids)):
         filepath = Path(f"./{output_directory}/{model_id}.json")
         if filepath.exists():
             continue
