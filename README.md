@@ -159,7 +159,7 @@ GitHub assets, or if you want to update it).
 
 - List the known devices types in the dump:
 
-        $ python -m src db_stats -l
+        $ python -m src db_stats -ld
         Device Name: Device ID
         TV: 1
         Set-top box: 2
@@ -181,7 +181,7 @@ GitHub assets, or if you want to update it).
         # 1 of them or both can be used later.
 
     With **these ids & names you will be able to export codes for a
-    specific devic or brande**, like shown in the next section.
+    specific device or brand**, like shown in the next section.
     Other formats can be easily implemented by someone who needs it.
 
 - Filtering brand and key names is possible by using `--brands` and
