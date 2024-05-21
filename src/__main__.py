@@ -84,6 +84,12 @@ def check_device_path(db_path, deviceid):
 
 def db_export(deviceid=None, format=None, db_path=None, output=None, **kwargs):
     """Export data to various formats"""
+    if deviceid == 3:
+        raise NotImplementedError(
+            "Deciphering AC IR patterns is not currently supported. Any help "
+            "is welcome to do this part of reverse engineering!"
+        )
+
     # Load devices ids/names mapping
     device_mapping = {
         k: v["name"] for k, v in load_devices(Path(f"{db_path}/devices.json")).items()
