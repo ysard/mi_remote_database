@@ -348,3 +348,4 @@ but time could be missing to implement large functionality requests ;)
 ## Thanks
 
 @LionZXY (Help with Flipper Zero support #3).
+@Biswa96 (Bug fixes).
