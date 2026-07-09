@@ -144,7 +144,7 @@ Get some help:
     $ python -m src --help
 
 - Dump the database (If you don't want to use the one that is available in the
-GitHub assets, or if you want to update it).
+GitHub assets ([here!](https://github.com/ysard/mi_remote_database/releases)), or if you want to update it).
 
         $ python -m src db_dump
         # or just:
